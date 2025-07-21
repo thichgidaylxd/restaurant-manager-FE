@@ -49,7 +49,7 @@ export class AuthService {
     return { success: true };
   }
 
-  static async register(Account: { accountName: string, account: string, role: string, password: string, confirmPassword: string }) {
+  static async register(Account: { accountName: string, account: string, roleId: string, password: string, confirmPassword: string }) {
     try {
 
       const response = await axiosInstance.post("/auth/register", Account);

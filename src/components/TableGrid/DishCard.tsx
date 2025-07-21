@@ -1,7 +1,7 @@
 import { OrderItem } from "@/types/table";
 import { Dish } from "@/types/dish";
 import { Check, Clock, Trash2, Plus, Minus } from "lucide-react";
-
+import { getUserRole } from "@/utils/auth";
 interface DishCardProps {
   dish: OrderItem & Pick<Dish, "name" | "price" | "unit"> & { tableId?: string };
   index: number;
@@ -11,12 +11,14 @@ interface DishCardProps {
   onStatusToggle: (id: string) => void;
   onDelete?: (id: string) => void;
   onEdit?: (dish: any) => void; // thêm prop mới
+  role: String;
 }
 
 const DishCard: React.FC<DishCardProps> = ({
   dish,
   index,
   isSelected,
+  role,
   onSelect,
   onQuantityChange,
   onStatusToggle,
@@ -84,6 +86,7 @@ const DishCard: React.FC<DishCardProps> = ({
             e.stopPropagation();
             onStatusToggle(dish.id);
           }}
+          disabled={!(role === "Nhân viên bếp" || role === "Người quản lý")}
           className={`px-4 py-2 rounded-lg font-medium hover:scale-110 hover:shadow-lg ${dish.status === "Đã gọi"
             ? "bg-gray-200 text-gray-700"
             : dish.status === "Đang chuẩn bị"
