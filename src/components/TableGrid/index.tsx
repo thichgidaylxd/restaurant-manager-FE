@@ -59,7 +59,6 @@ const TableGrid = () => {
   const [dishError, setDishError] = useState<string | null>(null);
   const [tableError, setTableError] = useState<string | null>(null);
   const [showAddTable, setShowAddTable] = useState(false);
-  const [tableTypes, setTableTypes] = useState<TableType[]>([]);
   const [newTable, setNewTable] = useState({
     name: "",
     tableTypeId: "",
@@ -78,6 +77,7 @@ const TableGrid = () => {
     tables = [],
     setTables,
     menuItems = [],
+    tableTypes = [],
     updateTableStatus,
     addNewTable,
     addDishesToTable,
@@ -113,13 +113,6 @@ const TableGrid = () => {
     const formattedTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     setTimeClicked(formattedTime);
   };
-
-  useEffect(() => {
-    fetchTableTypes().catch((err) => {
-      console.error("Lỗi khi tải loại bàn:", err);
-      setAddTableError("Không thể tải danh sách loại bàn");
-    });
-  }, [fetchTableTypes]);
 
   // Automatically fetch tables on component mount
   useEffect(() => {
@@ -512,7 +505,7 @@ const TableGrid = () => {
       try {
         const res = await TableTypeService.createTableType(newTypeName);
         if (res && res.code === 200 && Array.isArray(res.data)) {
-          setTableTypes(res.data);
+          await fetchTableTypes();
           setShowAddType(false);
           const added = res.data.find(t => t.name === newTypeName) || res.data[res.data.length - 1];
           setNewTable({ ...newTable, tableTypeId: added.id });
@@ -681,7 +674,7 @@ const TableGrid = () => {
                                 try {
                                   const res = await TableTypeService.deleteTableType(type.id);
                                   if (res && res.code === 200) {
-                                    setTableTypes(tableTypes.filter(t => t.id !== type.id));
+                                    await fetchTableTypes();
                                     toast({ title: "Đã xóa loại bàn thành công!" });
                                   } else {
                                     toast({ title: "Xóa loại bàn thất bại!", variant: "destructive" });

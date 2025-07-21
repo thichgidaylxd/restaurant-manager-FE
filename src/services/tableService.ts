@@ -12,6 +12,7 @@ interface TableData {
   loading: boolean;
   error: string | null;
   apiMessage: string | null;
+  tableTypes: TableType[];
   updateTableStatus: (tableId: string, status: string) => Promise<void>;
   addNewTable: (table: Partial<RestaurantTable>) => Promise<void>;
   addDishesToTable: (tableId: string, items: any[]) => Promise<void>;
@@ -338,6 +339,7 @@ export const useTableService = (): TableData => {
     loading,
     error,
     apiMessage,
+    tableTypes,
     updateTableStatus,
     addNewTable,
     addDishesToTable,
