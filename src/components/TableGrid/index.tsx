@@ -211,24 +211,37 @@ const TableGrid = () => {
     }
   };
 
-  const callOrder = async () => {
+  const updateUncalledDishes = async () => {
     if (selTable) {
-      const currentTable = getTableById(selTable);
-      if (!currentTable?.dishes) return;
+      try {
+        const currentTable = getTableById(selTable);
+        const uncalledDishes = currentTable?.dishes?.filter(dish => dish.status === "Chưa gọi");
 
-      for (const dish of currentTable.dishes) {
-        if (dish.status === "Ordered") {
-          try {
-            const processingTime = Math.random() * 8000 + 3000;
-            setTimeout(() => {
-              const isCompleted = Math.random() > 0.3;
-              const finalStatus = isCompleted ? "Completed" : "Rejected";
-              const finalTimestamp = Date.now();
-            }, processingTime);
-          } catch (err) {
-            console.error("Lỗi khi xử lý đơn hàng:", err);
+        if (uncalledDishes && uncalledDishes.length > 0) {
+          for (const dish of uncalledDishes) {
+            await updateDishStatus(selTable, dish.id, "Đã gọi");
+            setNotifs((prev) => [
+              ...prev,
+              {
+                id: `notif-${Date.now()}`,
+                tableId: selTable,
+                dishId: dish.id,
+                dishName: dish.dishName,
+                quantity: 1,
+                status: dish.status,
+                timestamp: Date.now(),
+              },
+            ]);
           }
+          await fetchTableDishes(selTable);
+          toast({ title: "Đã cập nhật trạng thái các món 'Chưa gọi' thành 'Đã gọi'!" });
+        } else {
+          toast({ title: "Không có món nào ở trạng thái 'Chưa gọi'" });
         }
+      } catch (err) {
+        console.error("Lỗi khi cập nhật các món:", err);
+        setDishError("Không thể cập nhật trạng thái món");
+        toast({ title: "Cập nhật trạng thái thất bại!", variant: "destructive" });
       }
     }
   };
@@ -252,6 +265,18 @@ const TableGrid = () => {
                   : "Đã gọi";
           await updateDishStatus(selTable, dishId, newStatus);
           await fetchTableDishes(selTable);
+          setNotifs((prev) => [
+            ...prev,
+            {
+              id: `notif-${Date.now()}`,
+              tableId: selTable,
+              dishId: dish.id,
+              dishName: dish.dishName,
+              quantity: 1,
+              status: dish.status,
+              timestamp: Date.now(),
+            },
+          ]);
           toast({ title: "Cập nhật trạng thái thành công!" });
         }
       } catch (err) {
@@ -261,6 +286,9 @@ const TableGrid = () => {
       }
     }
   };
+
+
+
 
   const handleQuantityChange = async (orderItemId: string, quantity: number) => {
     if (selTable) {
@@ -505,7 +533,7 @@ const TableGrid = () => {
     if (newTypeName.trim()) {
       try {
         const res = await TableTypeService.createTableType(newTypeName);
-        if (res && res.code === 200 && Array.isArray(res.data)) {
+        if (res.code === 200) {
           await fetchTableTypes();
           setShowAddType(false);
           const added = res.data.find(t => t.name === newTypeName) || res.data[res.data.length - 1];
@@ -947,7 +975,7 @@ const TableGrid = () => {
               <NotificationSidebar
                 notifications={notifs}
                 tableId={selTable}
-                onCallOrder={callOrder}
+                onCallOrder={updateUncalledDishes}
               />
             )}
           </div>

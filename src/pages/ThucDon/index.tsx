@@ -405,7 +405,7 @@ const ThucDon = () => {
           </div>
         </div>
         {/* Danh sách món ăn */}
-        <div className="px-8 pb-4 max-h-[560px] overflow-y-auto scrollbar-thin scrollbar-thumb-orange-400 scrollbar-track-transparent grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="px-8 pb-4 max-h-[560px] overflow-y-auto scrollbar-thin scrollbar-thumb-orange-400 scrollbar-track-transparent grid grid-cols-1 md:grid-cols-2 gap-4 group ">
           {loading && <p className="text-gray-700">Đang tải...</p>}
           {error && <p className="text-red-600">{error}</p>}
           {!loading && !error && filteredDishes.length === 0 && <p className=" text-orange-700 text-center">Không có món ăn</p>}
@@ -432,7 +432,7 @@ const ThucDon = () => {
                 </span>
               </div>
               {/* Cột 3: Nút sửa/xóa */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 group-hover:opacity-100 opacity-0 transition-opacity duration-300 ">
                 <button
                   className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 hover:scale-110 transition-all duration-200 shadow-sm hover:shadow-md"
                   onClick={() => openEditDish(dish)}

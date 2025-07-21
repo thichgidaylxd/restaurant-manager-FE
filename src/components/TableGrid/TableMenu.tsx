@@ -101,15 +101,6 @@ const TableMenu: React.FC<TableMenuProps> = ({
                                         {type.name}
                                     </SelectItem>
                                 ))}
-                                <div className="px-2 py-1">
-                                  <button
-                                    type="button"
-                                    className="w-full flex items-center gap-2 px-3 py-2 rounded bg-orange-100 hover:bg-orange-200 text-orange-700 font-semibold transition"
-                                    onClick={() => setShowAddDishType(true)}
-                                  >
-                                    <Plus className="w-4 h-4" /> Thêm loại món
-                                  </button>
-                                </div>
                             </SelectContent>
                         </Select>
                         <div className="flex items-center border border-orange-200 rounded-full px-4 py-0 mr-8 bg-white shadow-sm">
@@ -164,10 +155,10 @@ const TableMenu: React.FC<TableMenuProps> = ({
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                         {filteredDishes.map((item, i) => (
                             <MenuCard
-                              key={item.id}
-                              item={item}
-                              index={i}
-                              onAddToCart={addToCart}
+                                key={item.id}
+                                item={item}
+                                index={i}
+                                onAddToCart={addToCart}
                             />
                         ))}
 
@@ -175,55 +166,55 @@ const TableMenu: React.FC<TableMenuProps> = ({
                 )}
             </div>
             {showAddDishType && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-                <div className="bg-white rounded-xl shadow-2xl p-6 w-80 flex flex-col items-center ">
-                  <div className="text-lg font-bold text-orange-700 mb-4">Thêm loại món mới</div>
-                  <input
-                    type="text"
-                    value={newDishTypeName}
-                    onChange={e => setNewDishTypeName(e.target.value)}
-                    placeholder="Nhập tên loại món"
-                    className="w-full px-3 py-2 border rounded mb-4 focus:ring-2 focus:ring-orange-200"
-                    maxLength={30}
-                    autoFocus
-                  />
-                  <div className="flex gap-2 w-full">
-                    <button
-                      className="flex-1 px-4 py-2 rounded-lg bg-orange-500 text-white font-semibold hover:bg-orange-600 transition disabled:opacity-50"
-                      onClick={async () => {
-                        if (!newDishTypeName.trim()) return;
-                        setAddingType(true);
-                        try {
-                          const res = await MenuService.createDishType(newDishTypeName);
-                          if (res && res.code === 200) {
-                            toast({ title: "Thêm loại món thành công!" });
-                            setShowAddDishType(false);
-                            setNewDishTypeName("");
-                            // reload dishTypes
-                            const response = await MenuService.getAllDishTypes();
-                            setDishTypes(response.data || []);
-                          } else {
-                            toast({ title: "Thêm loại món thất bại!", variant: "destructive" });
-                          }
-                        } catch {
-                          toast({ title: "Lỗi khi thêm loại món!", variant: "destructive" });
-                        } finally {
-                          setAddingType(false);
-                        }
-                      }}
-                      disabled={!newDishTypeName.trim() || addingType}
-                    >
-                      Thêm
-                    </button>
-                    <button
-                      className="flex-1 px-4 py-2 rounded-lg bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition"
-                      onClick={() => setShowAddDishType(false)}
-                    >
-                      Huỷ
-                    </button>
-                  </div>
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                    <div className="bg-white rounded-xl shadow-2xl p-6 w-80 flex flex-col items-center ">
+                        <div className="text-lg font-bold text-orange-700 mb-4">Thêm loại món mới</div>
+                        <input
+                            type="text"
+                            value={newDishTypeName}
+                            onChange={e => setNewDishTypeName(e.target.value)}
+                            placeholder="Nhập tên loại món"
+                            className="w-full px-3 py-2 border rounded mb-4 focus:ring-2 focus:ring-orange-200"
+                            maxLength={30}
+                            autoFocus
+                        />
+                        <div className="flex gap-2 w-full">
+                            <button
+                                className="flex-1 px-4 py-2 rounded-lg bg-orange-500 text-white font-semibold hover:bg-orange-600 transition disabled:opacity-50"
+                                onClick={async () => {
+                                    if (!newDishTypeName.trim()) return;
+                                    setAddingType(true);
+                                    try {
+                                        const res = await MenuService.createDishType(newDishTypeName);
+                                        if (res && res.code === 200) {
+                                            toast({ title: "Thêm loại món thành công!" });
+                                            setShowAddDishType(false);
+                                            setNewDishTypeName("");
+                                            // reload dishTypes
+                                            const response = await MenuService.getAllDishTypes();
+                                            setDishTypes(response.data || []);
+                                        } else {
+                                            toast({ title: "Thêm loại món thất bại!", variant: "destructive" });
+                                        }
+                                    } catch {
+                                        toast({ title: "Lỗi khi thêm loại món!", variant: "destructive" });
+                                    } finally {
+                                        setAddingType(false);
+                                    }
+                                }}
+                                disabled={!newDishTypeName.trim() || addingType}
+                            >
+                                Thêm
+                            </button>
+                            <button
+                                className="flex-1 px-4 py-2 rounded-lg bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition"
+                                onClick={() => setShowAddDishType(false)}
+                            >
+                                Huỷ
+                            </button>
+                        </div>
+                    </div>
                 </div>
-              </div>
             )}
         </div>
     );

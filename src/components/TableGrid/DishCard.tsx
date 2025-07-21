@@ -99,12 +99,11 @@ const DishCard: React.FC<DishCardProps> = ({
         </button>
       </div>
       {/* Nút cập nhật và xóa khi hover hoặc isSelected */}
-      <div className={`absolute top-2 right-2 flex gap-2 transition-opacity duration-200 ${isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
-
+      <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
         <button
-          onClick={e => {
+          onClick={(e) => {
             e.stopPropagation();
-            onDelete(dish.id);
+            onDelete?.(dish.id);
           }}
           className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 hover:scale-110 hover:rotate-12 animate-bounce-in"
           title="Xóa món"
@@ -112,6 +111,8 @@ const DishCard: React.FC<DishCardProps> = ({
           <Trash2 className="w-4 h-4" />
         </button>
       </div>
+
+
       <div>{dish.note === null ? "" : dish.note}</div>
     </div>
 

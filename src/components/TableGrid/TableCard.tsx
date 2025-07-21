@@ -17,7 +17,7 @@ const TableCard: React.FC<TableCardProps> = ({ table, index, onClick, onDelete }
       case "Đang sử dụng":
         return { text: table.status, bgColor: "bg-red-500", textColor: "text-white" };
       case "Thanh toán":
-        return { text: table.status, bgColor: "bg-red-500", textColor: "text-white" }; // Giả định, API chỉ trả "Trống" hiện tại
+        return { text: table.status, bgColor: "bg-orange-500", textColor: "text-white" }; // Giả định, API chỉ trả "Trống" hiện tại
     };// Giả định, API chỉ trả "Trống" hiện tại
   };
 

@@ -4,6 +4,7 @@ import { Notification } from "@/types/dish";
 import { useState } from "react";
 import axiosInstance from "@/config/axios";
 import dayjs from "dayjs";
+import { on } from "events";
 
 interface NotificationSidebarProps {
   notifications: Notification[];
@@ -25,6 +26,7 @@ const NotificationSidebar: React.FC<NotificationSidebarProps> = ({
     .sort((a, b) => b.timestamp - a.timestamp);
 
 
+
   return (
     <div className="flex-1 flex flex-col">
       <div className="bg-orange-100 border-2 border-orange-300 rounded-lg p-4 mb-4 flex-1 overflow-auto animate-slide-in-from-right">
@@ -41,7 +43,7 @@ const NotificationSidebar: React.FC<NotificationSidebarProps> = ({
             >
               <div className="w-2 h-2 rounded-full mt-2 bg-orange-500"></div>
               <div className="flex-1">
-                <p className="text-sm text-gray-800">{n.dishName || n.status || "Thông báo"}</p>
+                <p className="text-sm text-gray-800">{n.dishName} {n.status}</p>
                 <p className="text-xs text-gray-500">{dayjs(n.timestamp).format("HH:mm DD/MM/YYYY")}</p>
               </div>
             </div>
@@ -56,6 +58,7 @@ const NotificationSidebar: React.FC<NotificationSidebarProps> = ({
       <div className="flex flex-col gap-2 mt-2">
         <button
           className="w-full bg-orange-500 text-white py-2 rounded-lg font-medium hover:bg-orange-600 transition disabled:opacity-50"
+          onClick={onCallOrder}
         >
           Gọi món
         </button>

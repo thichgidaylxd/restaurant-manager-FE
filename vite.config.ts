@@ -28,6 +28,7 @@ export default defineConfig({
   },
   server: {
     // @ts-ignore
+    port: 8000,
     allowedHosts: true,
   },
 });
