@@ -446,7 +446,7 @@ const ThucDon = () => {
                     if (window.confirm(`Bạn có chắc muốn xóa món '${dish.name}'?`)) {
                       try {
                         const res = await MenuService.deleteDish(dish.id);
-                        if (res && res.data && res.data.code === 200) {
+                        if (res && res.code === 200) {
                           toast({ title: "Đã xóa món thành công!" });
                           // Reload lại danh sách
                           const response = selectedDishType
@@ -454,10 +454,10 @@ const ThucDon = () => {
                             : await MenuService.getAllMenuItems();
                           setDishes(response.data || []);
                         } else {
-                          toast({ title: "Xóa món thất bại!", variant: "destructive" });
+                          toast({ title: res.message || "Xóa món thất bại!", variant: "destructive" });
                         }
-                      } catch {
-                        toast({ title: "Lỗi khi xóa món!", variant: "destructive" });
+                      } catch (err: any) {
+                        toast({ title: err.message || "Lỗi khi xóa món!", variant: "destructive" });
                       }
                     }
                   }}
