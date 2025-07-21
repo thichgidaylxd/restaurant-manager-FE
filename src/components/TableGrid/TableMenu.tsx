@@ -65,27 +65,6 @@ const TableMenu: React.FC<TableMenuProps> = ({
         return matchesSearch && matchesType;
     });
 
-    // Handler cập nhật và xóa món
-    const handleEditDish = (dish: Dish) => {
-      // TODO: mở form cập nhật, truyền dữ liệu dish vào form (triển khai sau)
-      toast({ title: `Cập nhật món: ${dish.name}` });
-    };
-    const handleDeleteDish = async (dish: Dish) => {
-      if (!window.confirm(`Bạn có chắc muốn xóa món '${dish.name}'?`)) return;
-      try {
-        const res = await axiosInstance.delete(`/dishes/${dish.id}`);
-        if (res.data && res.data.code === 200) {
-          toast({ title: "Đã xóa món thành công!" });
-          fetchMenuItems();
-        } else {
-          toast({ title: "Xóa món thất bại!", variant: "destructive" });
-        }
-      } catch {
-        toast({ title: "Lỗi khi xóa món!", variant: "destructive" });
-      }
-    };
-
-
     return (
         <div className="w-full bg-orange-50 p-6 rounded-lg flex flex-col h-full">
             <div className="flex items-center justify-between mb-6 pb-4 border-b-2 border-orange-200 shrink-0">
@@ -190,8 +169,6 @@ const TableMenu: React.FC<TableMenuProps> = ({
                               item={item}
                               index={i}
                               onAddToCart={addToCart}
-                              onEdit={handleEditDish}
-                              onDelete={handleDeleteDish}
                             />
                         ))}
 

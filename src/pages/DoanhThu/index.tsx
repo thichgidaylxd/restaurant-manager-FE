@@ -64,15 +64,36 @@ const DoanhThu = () => {
     setError("");
     const fetchInvoices = async () => {
       try {
-        let res;
-        if (selectedDate) {
-          res = await InvoiceService.getAllInvoicesByDate(selectedDate);
-        } else {
-          res = await InvoiceService.getAllInvoices();
-        }
+        // Luôn lấy tất cả hóa đơn để lọc ở client-side
+        const res = await InvoiceService.getAllInvoices();
+
         if (res && res.code === 200 && Array.isArray(res.data)) {
+          let filteredInvoices = res.data;
+          const today = getToday();
+          const [weekStart, weekEnd] = getWeekRange();
+          const month = getMonth();
+
+          // Lọc theo ngày được chọn
+          if (selectedDate) {
+            filteredInvoices = filteredInvoices.filter((inv: any) => inv.createdAt?.slice(0, 10) === selectedDate);
+          }
+          // Lọc theo loại (Ngày, Tuần, Tháng)
+          else {
+            if (filterType === 'day') {
+              filteredInvoices = filteredInvoices.filter((inv: any) => inv.createdAt?.slice(0, 10) === today);
+            } else if (filterType === 'week') {
+              filteredInvoices = filteredInvoices.filter((inv: any) => {
+                const invDate = inv.createdAt?.slice(0, 10);
+                return invDate >= weekStart && invDate <= weekEnd;
+              });
+            } else if (filterType === 'month') {
+              filteredInvoices = filteredInvoices.filter((inv: any) => inv.createdAt?.startsWith(month));
+            }
+          }
+
+
           const byDate: Record<string, number> = {};
-          res.data.forEach((inv: any) => {
+          filteredInvoices.forEach((inv: any) => {
             const date = inv.createdAt?.slice(0, 10) || "N/A";
             // Tính tổng tiền hóa đơn
             let total = 0;
@@ -92,7 +113,7 @@ const DoanhThu = () => {
       }
     };
     fetchInvoices();
-  }, [selectedDate]);
+  }, [selectedDate, filterType]);
 
   // Lấy top món bán chạy (giả lập, bạn có thể fetch từ API nếu backend trả về sold)
   useEffect(() => {
@@ -215,16 +236,19 @@ const DoanhThu = () => {
           {/* Bộ lọc thông minh */}
           <div className="flex flex-wrap justify-between items-center mb-10 gap-4 px-2 md:px-0 animate-fade-in">
             <div className="flex items-center gap-4">
-              <button className={`px-5 py-2 rounded-xl font-bold text-lg border-2 transition ${filterType === 'day' ? 'bg-orange-500 text-white border-orange-500' : 'bg-white text-orange-500 border-orange-200 hover:bg-orange-50'}`} onClick={() => setFilterType('day')}>Ngày</button>
-              <button className={`px-5 py-2 rounded-xl font-bold text-lg border-2 transition ${filterType === 'week' ? 'bg-orange-500 text-white border-orange-500' : 'bg-white text-orange-500 border-orange-200 hover:bg-orange-50'}`} onClick={() => setFilterType('week')}>Tuần</button>
-              <button className={`px-5 py-2 rounded-xl font-bold text-lg border-2 transition ${filterType === 'month' ? 'bg-orange-500 text-white border-orange-500' : 'bg-white text-orange-500 border-orange-200 hover:bg-orange-50'}`} onClick={() => setFilterType('month')}>Tháng</button>
+              <button className={`px-5 py-2 rounded-xl font-bold text-lg border-2 transition ${filterType === 'day' ? 'bg-orange-500 text-white border-orange-500' : 'bg-white text-orange-500 border-orange-200 hover:bg-orange-50'}`} onClick={() => { setFilterType('day'); setSelectedDate(''); }}>Ngày</button>
+              <button className={`px-5 py-2 rounded-xl font-bold text-lg border-2 transition ${filterType === 'week' ? 'bg-orange-500 text-white border-orange-500' : 'bg-white text-orange-500 border-orange-200 hover:bg-orange-50'}`} onClick={() => { setFilterType('week'); setSelectedDate(''); }}>Tuần</button>
+              <button className={`px-5 py-2 rounded-xl font-bold text-lg border-2 transition ${filterType === 'month' ? 'bg-orange-500 text-white border-orange-500' : 'bg-white text-orange-500 border-orange-200 hover:bg-orange-50'}`} onClick={() => { setFilterType('month'); setSelectedDate(''); }}>Tháng</button>
             </div>
             <div className="flex items-center gap-2">
               <label className="font-semibold text-orange-700 text-lg flex items-center gap-2"><Calendar className="w-5 h-5" />Chọn ngày:</label>
               <input
                 type="date"
                 value={selectedDate}
-                onChange={e => setSelectedDate(e.target.value)}
+                onChange={e => {
+                  setSelectedDate(e.target.value);
+                  setFilterType('day'); // Khi chọn ngày cụ thể, tự động chuyển về filter type 'day'
+                }}
                 className="border border-orange-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-200 text-lg"
                 max={getToday()}
               />
