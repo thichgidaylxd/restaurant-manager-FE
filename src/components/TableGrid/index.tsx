@@ -108,7 +108,8 @@ const TableGrid = () => {
     fetchTypes();
   }, [fetchTableTypes]);
 
-  const recordPaymentRequestTime = () => {
+  const recordPaymentRequestTime = async () => {
+    await updateTableStatus(selTable, "Thanh toán");
     const now = new Date();
     const formattedTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     setTimeClicked(formattedTime);
@@ -199,7 +200,7 @@ const TableGrid = () => {
           note: item.note || undefined,
         }));
         await addDishesToTable(selTable, orderItems);
-        await updateTableStatus(selTable, "Đang sử dụng");
+        await fetchTables();
         setCart([]);
         setIsMenuView(false);
         await fetchTableDishes(selTable);
@@ -275,8 +276,8 @@ const TableGrid = () => {
 
   const addTable = async () => {
     try {
-      const tableCount = tables.length + 100;
-      const tableName = newTable.name || `Bàn ${tableCount}`;
+
+      const tableName = newTable.name;
       const existingTable = tables.find((t) => t.name === tableName);
       if (existingTable) {
         setAddTableError(`Bàn ${tableName} đã tồn tại. Vui lòng chọn tên khác.`);
@@ -893,6 +894,7 @@ const TableGrid = () => {
                       index={i}
                       isSelected={selDish === d.id}
                       onSelect={setSelDish}
+                      onDelete={delDish}
                       onQuantityChange={handleQuantityChange}
                       onStatusToggle={toggleStatus}
                     />
@@ -904,7 +906,8 @@ const TableGrid = () => {
             <div className="flex items-center justify-between pt-4 border-t-2 border-orange-200 shrink-0">
               <button
                 onClick={recordPaymentRequestTime}
-                className="bg-white border-2 border-orange-500 text-orange-500 px-6 py-3 rounded-lg font-medium hover:bg-orange-50 animate-bounce-in flex flex-col items-center"
+                disabled={currentTable?.dishes?.length === 0}
+                className={`bg-white border-2 border-orange-500 text-orange-500 px-6 py-3 rounded-lg font-medium hover:bg-orange-50 animate-bounce-in flex flex-col items-center ${currentTable?.dishes?.length === 0 ? " opacity-50 cursor-not-allowed" : ""}`}
               >
                 Yêu cầu thanh toán
               </button>
@@ -912,8 +915,7 @@ const TableGrid = () => {
               <button
                 onClick={payRequest}
                 disabled={currentTable?.dishes?.length === 0}
-                className={`bg-orange-500 text-white px-6 py-3 rounded-lg font-bold text-lg animate-fade-in hover:bg-orange-600 ${currentTable?.dishes?.length === 0 ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
+                className={`bg-orange-500 text-white px-6 py-3 rounded-lg font-bold text-lg animate-fade-in hover:bg-orange-600 ${currentTable?.dishes?.length === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
               >
                 Tổng: {total.toLocaleString()}.VND
               </button>
@@ -931,33 +933,37 @@ const TableGrid = () => {
 
       </div>
 
-      {selTable && (
-        <div className="w-80 bg-white border-l-2 border-gray-200 p-4 flex flex-col h-full shrink-0">
-          {isMenuView ? (
-            <CartSidebar
-              cart={cart}
-              onQuantityChange={updateCartQty}
-              onAddToTable={addCartToTable}
-              onNoteChange={updateCartNote}
-            />
-          ) : (
-            <NotificationSidebar
-              notifications={notifs}
-              tableId={selTable}
-              onCallOrder={callOrder}
-            />
-          )}
-        </div>
-      )}
-
-      {showDelNotif && (
-        <div className="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-slide-in-from-right hover:scale-105">
-          <div className="flex items-center space-x-2">
-            <Check className="w-4 h-4 animate-bounce" />
-            <span>{notifMessage}</span>
+      {
+        selTable && (
+          <div className="w-80 bg-white border-l-2 border-gray-200 p-4 flex flex-col h-full shrink-0">
+            {isMenuView ? (
+              <CartSidebar
+                cart={cart}
+                onQuantityChange={updateCartQty}
+                onAddToTable={addCartToTable}
+                onNoteChange={updateCartNote}
+              />
+            ) : (
+              <NotificationSidebar
+                notifications={notifs}
+                tableId={selTable}
+                onCallOrder={callOrder}
+              />
+            )}
           </div>
-        </div>
-      )}
+        )
+      }
+
+      {
+        showDelNotif && (
+          <div className="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-slide-in-from-right hover:scale-105">
+            <div className="flex items-center space-x-2">
+              <Check className="w-4 h-4 animate-bounce" />
+              <span>{notifMessage}</span>
+            </div>
+          </div>
+        )
+      }
 
       <Dialog open={showAddTable} onOpenChange={() => {
         setShowAddTable(false);
@@ -1050,37 +1056,39 @@ const TableGrid = () => {
         </DialogContent>
       </Dialog>
 
-      {showAddType && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white rounded-xl shadow-2xl p-6 w-80 flex flex-col items-center ">
-            <div className="text-lg font-bold text-orange-700 mb-4">Thêm loại bàn mới</div>
-            <input
-              type="text"
-              value={newTypeName}
-              onChange={e => setNewTypeName(e.target.value)}
-              placeholder="Nhập tên loại bàn"
-              className="w-full px-3 py-2 border rounded mb-4 focus:ring-2 focus:ring-orange-200"
-              maxLength={30}
-              autoFocus
-            />
-            <div className="flex gap-2 w-full">
-              <button
-                className="flex-1 px-4 py-2 rounded-lg bg-orange-500 text-white font-semibold hover:bg-orange-600 transition disabled:opacity-50"
-                onClick={handleAddTableType}
-                disabled={!newTypeName.trim()}
-              >
-                Thêm
-              </button>
-              <button
-                className="flex-1 px-4 py-2 rounded-lg bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition"
-                onClick={() => setShowAddType(false)}
-              >
-                Huỷ
-              </button>
+      {
+        showAddType && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div className="bg-white rounded-xl shadow-2xl p-6 w-80 flex flex-col items-center ">
+              <div className="text-lg font-bold text-orange-700 mb-4">Thêm loại bàn mới</div>
+              <input
+                type="text"
+                value={newTypeName}
+                onChange={e => setNewTypeName(e.target.value)}
+                placeholder="Nhập tên loại bàn"
+                className="w-full px-3 py-2 border rounded mb-4 focus:ring-2 focus:ring-orange-200"
+                maxLength={30}
+                autoFocus
+              />
+              <div className="flex gap-2 w-full">
+                <button
+                  className="flex-1 px-4 py-2 rounded-lg bg-orange-500 text-white font-semibold hover:bg-orange-600 transition disabled:opacity-50"
+                  onClick={handleAddTableType}
+                  disabled={!newTypeName.trim()}
+                >
+                  Thêm
+                </button>
+                <button
+                  className="flex-1 px-4 py-2 rounded-lg bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition"
+                  onClick={() => setShowAddType(false)}
+                >
+                  Huỷ
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
       <PaymentDialog
         isOpen={showPay}
@@ -1094,7 +1102,7 @@ const TableGrid = () => {
 
         total={total}
       />
-    </div>
+    </div >
   );
 };
 

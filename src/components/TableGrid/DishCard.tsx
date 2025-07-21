@@ -100,16 +100,7 @@ const DishCard: React.FC<DishCardProps> = ({
       </div>
       {/* Nút cập nhật và xóa khi hover hoặc isSelected */}
       <div className={`absolute top-2 right-2 flex gap-2 transition-opacity duration-200 ${isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
-        <button
-          onClick={e => {
-            e.stopPropagation();
-            onEdit(dish);
-          }}
-          className="p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 hover:scale-110 hover:rotate-12 animate-bounce-in"
-          title="Cập nhật món"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536M9 13h3l8-8a2.828 2.828 0 00-4-4l-8 8v3zm0 0v3h3" /></svg>
-        </button>
+
         <button
           onClick={e => {
             e.stopPropagation();

@@ -13,8 +13,10 @@ const TableCard: React.FC<TableCardProps> = ({ table, index, onClick, onDelete }
   const getStatusDisplay = () => {
     switch (table.status) {
       case "Trống":
-        return { text: "Trống", bgColor: "bg-green-500", textColor: "text-white" };
+        return { text: table.status, bgColor: "bg-green-500", textColor: "text-white" };
       case "Đang sử dụng":
+        return { text: table.status, bgColor: "bg-red-500", textColor: "text-white" };
+      case "Thanh toán":
         return { text: table.status, bgColor: "bg-red-500", textColor: "text-white" }; // Giả định, API chỉ trả "Trống" hiện tại
     };// Giả định, API chỉ trả "Trống" hiện tại
   };

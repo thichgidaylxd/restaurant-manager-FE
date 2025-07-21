@@ -144,7 +144,6 @@ export const useTableService = (): TableData => {
         setApiMessage(result.message || "Không thể cập nhật trạng thái bàn");
         throw new Error(result.message || "Không thể cập nhật trạng thái bàn");
       }
-      // Cập nhật lại state tables nếu cần
       setTables((prev) =>
         prev.map((t) =>
           t.id === tableId ? { ...t, status } : t
