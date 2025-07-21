@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Menu, Plus } from "lucide-react";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { AuthService } from "@/services/authService";
-import axiosInstance from "@/config/axios";
-import { useState, useEffect } from "react";
 import { toast } from "@/components/ui/use-toast";
 import Sidebar from "@/components/layout/Sidebar";
+import { User, Role } from "@/types/user";
+import { UserService } from "@/services/userService";
 
 const mockData = Array.from({ length: 12 }).map((_, i) => ({
   name: "Loại tài khoản",
@@ -20,8 +20,8 @@ const mockData = Array.from({ length: 12 }).map((_, i) => ({
 
 const TaiKhoan = () => {
   const [showAdd, setShowAdd] = useState(false);
-  const [roles, setRoles] = useState<{ id: string, name: string }[]>([]);
-  const [accounts, setAccounts] = useState(mockData);
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     userAccount: "",
@@ -33,9 +33,20 @@ const TaiKhoan = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    // Lấy danh sách role từ API
-    axiosInstance.get("/role").then(res => {
-      if (res.data && res.data.code === 200) setRoles(res.data.data || []);
+    // Fetch users (giả lập)
+    setUsers([
+      { id: "1", account: "user1", accountName: "User 1", role: "Quản trị viên", createdAt: "2023-01-01" },
+      { id: "2", account: "user2", accountName: "User 2", role: "Nhân viên", createdAt: "2023-02-01" },
+      { id: "3", account: "user3", accountName: "User 3", role: "Khách hàng", createdAt: "2023-03-01" },
+    ]);
+
+    // Fetch roles from service
+    UserService.getRoles().then(res => {
+      if (res && res.code === 200) {
+        setRoles(res.data);
+      }
+    }).catch(err => {
+      console.error("Failed to fetch roles:", err);
     });
   }, []);
 
@@ -65,9 +76,9 @@ const TaiKhoan = () => {
       setShowAdd(false);
       setForm({ userAccount: "", userAccountName: "", role: "", password: "", confirmPassword: "" });
       // Thêm vào danh sách (giả lập, thực tế nên reload từ API)
-      setAccounts(accs => [
-        { name: form.userAccountName, phone: form.userAccount, role: roles.find(r => r.id === form.role)?.name || "", createdAt: new Date().toLocaleDateString() },
-        ...accs
+      setUsers(users => [
+        { id: Date.now().toString(), account: form.userAccount, accountName: form.userAccountName, role: roles.find(r => r.id === form.role)?.name || "", createdAt: new Date().toLocaleDateString() },
+        ...users
       ]);
     } else {
       setError(res.message || "Thêm tài khoản thất bại!");
@@ -101,12 +112,12 @@ const TaiKhoan = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {mockData.map((row, idx) => (
-              <TableRow key={idx} className="bg-white border-b last:rounded-b-lg">
-                <TableCell>{row.name}</TableCell>
-                <TableCell>{row.phone}</TableCell>
-                <TableCell>{row.role}</TableCell>
-                <TableCell>{row.createdAt}</TableCell>
+            {users.map((user, idx) => (
+              <TableRow key={user.id} className="bg-white border-b last:rounded-b-lg">
+                <TableCell>{user.accountName}</TableCell>
+                <TableCell>{user.account}</TableCell>
+                <TableCell>{user.role}</TableCell>
+                <TableCell>{user.createdAt}</TableCell>
               </TableRow>
             ))}
           </TableBody>

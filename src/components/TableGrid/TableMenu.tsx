@@ -8,7 +8,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Menu, Plus, Tag, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
-import axiosInstance from "@/config/axios";
 
 
 interface TableMenuProps {
@@ -195,8 +194,8 @@ const TableMenu: React.FC<TableMenuProps> = ({
                         if (!newDishTypeName.trim()) return;
                         setAddingType(true);
                         try {
-                          const res = await axiosInstance.post("/dish-types", { name: newDishTypeName });
-                          if (res.data && res.data.code === 200) {
+                          const res = await MenuService.createDishType(newDishTypeName);
+                          if (res && res.code === 200) {
                             toast({ title: "Thêm loại món thành công!" });
                             setShowAddDishType(false);
                             setNewDishTypeName("");

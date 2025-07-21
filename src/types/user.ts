@@ -1,11 +1,14 @@
 export interface User {
   id: string;
-  email: string;
-  name: string;
-  role: "admin" | "manager" | "staff";
-  avatar?: string;
+  account: string;
+  accountName: string;
+  role: string;
   createdAt: string;
-  updatedAt: string;
+}
+
+export interface Role {
+  id: string;
+  name: string;
 }
 
 export interface UserProfile {
