@@ -6,6 +6,7 @@ export interface Invoice {
     userAccountName: string;
     invoiceDishResponses?: InvoiceDish[];
     createdAt: string;
+    sum: number;
 }
 
 export interface InvoiceDish {

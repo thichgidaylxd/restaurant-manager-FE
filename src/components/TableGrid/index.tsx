@@ -109,7 +109,7 @@ const TableGrid = () => {
   }, [fetchTableTypes]);
 
   const recordPaymentRequestTime = async () => {
-    await updateTableStatus(selTable, "Thanh toán");
+    await updateTableStatus(selTable, "Chờ thanh toán");
     const now = new Date();
     const formattedTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     setTimeClicked(formattedTime);

@@ -4,6 +4,7 @@ export class InvoiceService {
   static async getAllInvoices() {
     try {
       const response = await axiosInstance.get("/invoice");
+      console.log("Invoices fetched successfully:", response.data);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || "Lỗi khi lấy danh sách hóa đơn");

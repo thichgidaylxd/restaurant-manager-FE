@@ -52,6 +52,7 @@ const HoaDon = () => {
     doc.setFontSize(12);
     doc.text(`Mã hóa đơn: ${invoice.invoiceId}`, 14, 30);
     doc.text(`Bàn: ${invoice.tableName}`, 14, 38);
+    doc.text(`Thành tiền: ${invoice.sum}`, 14, 38);
     doc.text(`Người tạo: ${invoice.userAccountName || "N/A"}`, 14, 46);
     doc.text(`Trạng thái: ${invoice.status === "paid" ? "Đã thanh toán" : "Chưa thanh toán"}`, 14, 54);
 
@@ -148,6 +149,7 @@ const HoaDon = () => {
                   <tr className="bg-orange-100 text-orange-700">
                     <th className="px-4 py-2 text-left">Mã hóa đơn</th>
                     <th className="px-4 py-2 text-left">Bàn</th>
+                    <th className="px-4 py-2 text-left">Thành tiền</th>
                     <th className="px-4 py-2 text-left">Ngày tạo</th>
                     <th className="px-4 py-2 text-left">Trạng thái</th>
                     <th className="px-4 py-2 text-left">Xem</th>
@@ -157,8 +159,10 @@ const HoaDon = () => {
                   {filteredInvoices.map((inv: Invoice, idx: number) => (
                     <tr key={idx} className="border-b last:border-0 hover:bg-orange-50 transition">
                       <td className="px-4 py-2 font-semibold">{inv.invoiceId}</td>
-                      <td className="px-4 py-2">{inv.tableName}</td>
-                      <td className="px-4 py-2">{inv.createdAt ? format(new Date(inv.createdAt), "dd/MM/yyyy") : "N/A"}</td>
+                      <td className="px-4 py-2 font-semibold">{inv.tableName}</td>
+                      <td className="px-4 py-2 font-semibold">{inv.sum.toLocaleString("vi-VN")} VND</td>
+
+                      <td className="px-4 py-2 font-semibold">{inv.createdAt ? format(new Date(inv.createdAt), "dd/MM/yyyy") : "N/A"}</td>
                       <td className="px-4 py-2">
                         <span className={`px-3 py-1 rounded-full text-xs font-bold ${inv.status === "paid" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>{inv.status === "paid" ? "Đã thanh toán" : "Chưa thanh toán"}</span>
                       </td>
