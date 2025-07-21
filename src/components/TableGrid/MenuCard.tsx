@@ -1,0 +1,72 @@
+import React from "react";
+import { Plus } from "lucide-react";
+import { Dish } from "@/types/dish";
+
+interface MenuCardProps {
+  item: Dish;
+  index: number;
+  onAddToCart: (item: Dish) => void;
+  onEdit: (item: Dish) => void; // thêm prop mới
+  onDelete: (item: Dish) => void; // thêm prop mới
+}
+
+const MenuCard: React.FC<MenuCardProps> = ({ item, index, onAddToCart, onEdit, onDelete }) => {
+  return (
+    <div
+      className="relative bg-orange-50 border-2 border-orange-200 rounded-lg p-4 hover:shadow-xl hover:scale-105 hover:-translate-y-2 animate-fade-in-up group"
+      style={{ animationDelay: `${index * 0.1}s` }}
+    >
+      <div className="flex items-center space-x-3 mb-3">
+        <div className="relative overflow-hidden rounded-lg">
+          <img
+            src={`data:image/jpg;base64,${item.image}`}
+            className="w-16 h-16 rounded-lg border-2 border-orange-200 object-cover group-hover:scale-110"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100"></div>
+        </div>
+        <div className="flex-1">
+          <h3 className="font-semibold text-gray-800 mb-1 group-hover:text-orange-600">
+            {item.name}
+          </h3>
+          <p className="text-orange-600 font-medium">
+            {item.price.toLocaleString()} VND
+          </p>
+        </div>
+      </div>
+      <div className="flex items-center justify-between">
+        <span className="text-sm text-red-600">{item.dishType.name}</span>
+        <button
+          onClick={() => onAddToCart(item)}
+          className="p-2 bg-orange-500 text-white rounded-full hover:bg-orange-600 hover:scale-110 hover:rotate-90 hover:shadow-lg animate-bounce-in"
+        >
+          <Plus className="w-4 h-4" />
+        </button>
+      </div>
+      {/* Nút cập nhật và xóa khi hover */}
+      <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        <button
+          onClick={e => {
+            e.stopPropagation();
+            onEdit(item);
+          }}
+          className="p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 hover:scale-110 hover:rotate-12 animate-bounce-in"
+          title="Cập nhật món"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536M9 13h3l8-8a2.828 2.828 0 00-4-4l-8 8v3zm0 0v3h3" /></svg>
+        </button>
+        <button
+          onClick={e => {
+            e.stopPropagation();
+            onDelete(item);
+          }}
+          className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 hover:scale-110 hover:rotate-12 animate-bounce-in"
+          title="Xóa món"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default MenuCard;
