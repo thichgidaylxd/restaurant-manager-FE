@@ -56,6 +56,7 @@ export const useTableService = (): TableData => {
       if (result.code === 200) {
         setTableTypes(result.data || []);
         console.log("Loaded table types:", result.data);
+        return result.data || [];
       } else {
         setApiMessage(result.message || "Không thể tải danh sách loại bàn");
       }

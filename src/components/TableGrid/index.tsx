@@ -101,13 +101,12 @@ const TableGrid = () => {
     const fetchTypes = async () => {
       try {
         await fetchTableTypes();
-        setTableTypes(tableTypes);
       } catch (err) {
         setAddTableError("Không thể tải danh sách loại bàn");
       }
     };
     fetchTypes();
-  }, []);
+  }, [fetchTableTypes]);
 
   const recordPaymentRequestTime = () => {
     const now = new Date();
