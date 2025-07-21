@@ -510,11 +510,12 @@ const TableGrid = () => {
     setTableError(null);
   };
 
-  const tableStatuses = ["Trống", "Đang sử dụng", "Đã đặt"];
+  const tableStatuses = ["Trống", "Đang sử dụng", "Đã đặt", "Chờ thanh toán"];
   const statusMap: Record<string, string> = {
     Trống: "Trống",
     "Đang sử dụng": "Đang sử dụng",
     "Đã đặt": "Đã đặt",
+    "Chờ thanh toán": "Chờ thanh toán",
   };
 
   const filteredTables = tables.filter((t) => {

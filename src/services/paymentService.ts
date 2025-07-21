@@ -8,7 +8,7 @@ export interface TableType {
 export interface RestaurantTable {
   id: string;
   name: string;
-  status: "Trống" | "Đang sử dụng" | "Đã đặt";
+  status: "Trống" | "Đang sử dụng" | "Đã đặt" | "Chờ thanh toán";
   dishes?: Dish[];
   tableType: TableType;
 }
