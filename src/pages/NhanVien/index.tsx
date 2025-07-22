@@ -26,20 +26,44 @@ const NhanVien = () => {
   const [roleError, setRoleError] = useState("");
 
   useEffect(() => {
+    let isMounted = true; // bảo vệ tránh setState khi đã unmounted
+
     const fetchEmployees = async () => {
       setLoading(true);
       setError("");
+
       try {
         const res = await UserService.getAllEmployees();
-        setEmployees(res.data || res || []);
+
+        if (isMounted) {
+          // ✅ xử lý ảnh byte[] từ backend
+          const formatted = (res.data || []).map((emp) => ({
+            ...emp,
+            image: emp.image
+              ? `data:image/jpeg;base64,${emp.image}`
+              : "default-avatar-url.jpg", // nếu ảnh null
+          }));
+
+          setEmployees(formatted);
+        }
       } catch (err: any) {
-        setError(err.message || "Lỗi khi lấy danh sách nhân viên");
+        if (isMounted) {
+          setError(err.message || "Lỗi khi lấy danh sách nhân viên");
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
+
     fetchEmployees();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
+
 
   useEffect(() => {
     const fetchPositions = async () => {
