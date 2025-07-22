@@ -11,6 +11,7 @@ import Logout from "@/pages/Logout/Logout";
 import DatBan from "@/pages/DatBan";
 import NotFoundPage from "@/pages/NotFoundPage";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import Home from "@/pages/Home";
 
 
 // App Router - Main routing configuration
@@ -19,6 +20,7 @@ const AppRoutes = () => {
   return (
     <Routes>
       {/* All routes are now public - no authentication required */}
+      <Route path="/" element={<Home />} />
       <Route path="/datban" element={
         ProtectedRoute({ allowedRoles: ["Người quản lý"], children: <DatBan /> })
       } />
