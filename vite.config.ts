@@ -12,11 +12,7 @@ export default defineConfig({
   optimizeDeps: {
     entries: ["src/main.tsx", "src/tempobook/**/*"],
   },
-  plugins: [react(), tempo({
-    routes: {
-      enabled: false,
-    }
-  })],
+  plugins: [react(), tempo()],
   resolve: {
     preserveSymlinks: true,
     alias: {
@@ -24,6 +20,7 @@ export default defineConfig({
     },
   },
   define: {
+    
     "process.env": process.env,
   },
   server: {
