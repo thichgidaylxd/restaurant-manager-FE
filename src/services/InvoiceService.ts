@@ -37,4 +37,13 @@ export class InvoiceService {
       throw new Error(error.response?.data?.message || "Lỗi khi lấy danh sách hóa đơn theo ngày");
     }
   }
+
+  static async deleteInvoice(invoiceId: string) {
+    try {
+      const response = await axiosInstance.delete(`/invoice/${invoiceId}`);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Lỗi khi xóa hóa đơn");
+    }
+  }
 }

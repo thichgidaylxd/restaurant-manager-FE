@@ -20,3 +20,19 @@ export interface UserProfile {
   address?: string;
   dateOfBirth?: string;
 }
+
+export interface Position {
+  id: string;
+  name: string;
+}
+
+export interface Employee {
+  id: string;
+  positionId: string;
+  positionName: string;
+  image: string;
+  employeeName: string;
+  address: string;
+  birthDate: string;
+  phoneNumber: string;
+}
