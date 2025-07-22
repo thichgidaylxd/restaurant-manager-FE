@@ -1,3 +1,4 @@
+import { Position } from './../types/user';
 import axiosInstance from "@/config/axios";
 import { User } from "@/types/user";
 
@@ -39,8 +40,12 @@ export class UserService {
   }
 
   static async getAllEmployees() {
-    const response = await axiosInstance.get("/employee");
-    return response.data;
+    try {
+      const response = await axiosInstance.get("/employee");
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Lỗi khi lấy danh sách nhân viên");
+    }
   }
 
   static async createEmployee(data: any) {
@@ -51,32 +56,56 @@ export class UserService {
   }
 
   static async updateEmployee(data: any) {
-    const response = await axiosInstance.put("/employee", data);
-    return response.data;
+    try {
+      const response = await axiosInstance.put("/employee", data);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Lỗi khi cập nhật nhân viên");
+    }
   }
 
   static async deleteEmployee(employeeId: string) {
-    const response = await axiosInstance.delete(`/employee/${employeeId}`);
-    return response.data;
+    try {
+      const response = await axiosInstance.delete(`/employee/${employeeId}`);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Lỗi khi xóa nhân viên");
+    }
   }
 
   static async getAllPositions() {
-    const response = await axiosInstance.get("/role");
-    return response.data;
+    try {
+      const response = await axiosInstance.get("/position");
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Lỗi khi lấy danh sách chức vụ");
+    }
   }
 
   static async createPosition(roleName: string) {
-    const response = await axiosInstance.post("/role", { roleName });
-    return response.data;
+    try {
+      const response = await axiosInstance.post("/Position", { roleName });
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Lỗi khi tạo chức vụ");
+    }
   }
 
   static async deletePosition(roleId: string) {
-    const response = await axiosInstance.delete(`/role/${roleId}`);
-    return response.data;
+    try {
+      const response = await axiosInstance.delete(`/Position/${roleId}`);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Lỗi khi xóa chức vụ");
+    }
   }
 
   static async getAllAccounts() {
-    const response = await axiosInstance.get("/auth");
-    return response.data;
+    try {
+      const response = await axiosInstance.get("/auth");
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Lỗi khi lấy danh sách tài khoản");
+    }
   }
 }
