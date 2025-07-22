@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Bell } from "lucide-react";
 import { Notification } from "@/types/dish";
-import axiosInstance from "@/config/axios";
 import dayjs from "dayjs";
 
 interface NotificationSidebarProps {

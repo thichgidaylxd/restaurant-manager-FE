@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Calendar as CalendarIcon, Search, Receipt, Eye } from "lucide-react";
+import { Calendar as CalendarIcon, Search, Receipt, Eye, Trash2 } from "lucide-react";
 import { InvoiceService } from "@/services/InvoiceService";
 import type { Invoice, InvoiceDish } from "@/types/invoice";
 import Sidebar from "@/components/layout/Sidebar";
@@ -71,6 +71,22 @@ const HoaDon = () => {
       headStyles: { fillColor: [255, 165, 0] },
     });
   }
+
+  // Thêm hàm xóa hóa đơn
+  const handleDeleteInvoice = async (invoiceId: string) => {
+    if (!window.confirm("Bạn có chắc chắn muốn xóa hóa đơn này?")) return;
+    setLoading(true);
+    setError("");
+    try {
+      await InvoiceService.deleteInvoice(invoiceId);
+      setInvoices(prev => prev.filter(inv => inv.invoiceId !== invoiceId));
+      setShowDetail(false);
+    } catch (err: any) {
+      setError(err.message || "Lỗi khi xóa hóa đơn");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredInvoices = invoices.filter(
     (inv: Invoice) =>
@@ -153,6 +169,7 @@ const HoaDon = () => {
                     <th className="px-4 py-2 text-left">Ngày tạo</th>
                     <th className="px-4 py-2 text-left">Trạng thái</th>
                     <th className="px-4 py-2 text-left">Xem</th>
+                    <th className="px-4 py-2 text-left">Xóa</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -168,6 +185,11 @@ const HoaDon = () => {
                       </td>
                       <td className="px-4 py-2">
                         <button onClick={() => { setSelectedInvoice(inv); setShowDetail(true); }} className="p-2 bg-orange-100 rounded-full hover:bg-orange-200 transition"><Eye className="w-4 h-4 text-orange-600" /></button>
+                      </td>
+                      <td className="px-4 py-2">
+                        <button onClick={() => handleDeleteInvoice(inv.invoiceId)} className="p-2 bg-red-100 rounded-full hover:bg-red-200 transition" title="Xóa hóa đơn">
+                          <Trash2 className="w-4 h-4 text-red-600" />
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -222,7 +244,14 @@ const HoaDon = () => {
                     className="ml-2 px-4 py-2 rounded-lg bg-gray-300 text-gray-700 font-semibold hover:bg-gray-400 transition"
                   >
                     Xuất PDF
-                  </button>              </div>
+                  </button>
+                  <button
+                    onClick={() => handleDeleteInvoice(selectedInvoice.invoiceId)}
+                    className="ml-2 px-4 py-2 rounded-lg bg-red-500 text-white font-semibold hover:bg-red-600 transition"
+                  >
+                    Xóa hóa đơn
+                  </button>
+                </div>
               </div>
             </div>
 

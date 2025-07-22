@@ -33,12 +33,19 @@ const TaiKhoan = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    // Fetch users (giả lập)
-    setUsers([
-      { id: "1", account: "user1", accountName: "User 1", role: "Quản trị viên", createdAt: "2023-01-01" },
-      { id: "2", account: "user2", accountName: "User 2", role: "Nhân viên", createdAt: "2023-02-01" },
-      { id: "3", account: "user3", accountName: "User 3", role: "Khách hàng", createdAt: "2023-03-01" },
-    ]);
+    // Fetch users từ API
+    const fetchUsers = async () => {
+      setLoading(true);
+      try {
+        const res = await UserService.getAllAccounts();
+        setUsers(res.data || res || []);
+      } catch (err) {
+        setUsers([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUsers();
 
     // Fetch roles from service
     UserService.getRoles().then(res => {
@@ -75,11 +82,9 @@ const TaiKhoan = () => {
       toast({ title: "Thêm tài khoản thành công!" });
       setShowAdd(false);
       setForm({ userAccount: "", userAccountName: "", roleId: "", password: "", confirmPassword: "" });
-      // Thêm vào danh sách (giả lập, thực tế nên reload từ API)
-      setUsers(users => [
-        { id: Date.now().toString(), account: form.userAccount, accountName: form.userAccountName, role: roles.find(r => r.id === form.roleId)?.name || "", createdAt: new Date().toLocaleDateString() },
-        ...users
-      ]);
+      // Reload lại danh sách từ API
+      const accounts = await UserService.getAllAccounts();
+      setUsers(accounts.data || accounts || []);
     } else {
       setError(res.message || "Thêm tài khoản thất bại!");
     }
