@@ -7,9 +7,7 @@ import { toast } from "@/components/ui/use-toast";
 import { Card } from "@/components/ui/card";
 import { FaPhoneAlt, FaLock } from "react-icons/fa";
 
-
-const Login = () => {
-
+const Login: React.FC = () => {
   const [account, setAccount] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -20,7 +18,7 @@ const Login = () => {
     if (token != null) {
       navigate("/");
     }
-  }, []);
+  }, [navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,11 +41,21 @@ const Login = () => {
         backgroundBlendMode: 'overlay',
       }}
     >
+      {/* Back to Home Button */}
+      <div className="absolute top-4 left-4 z-40">
+        <Button
+          className="bg-orange-500 text-white font-semibold px-4 py-2 rounded-full hover:bg-orange-600 transition"
+          onClick={() => navigate("/")}
+        >
+          ← Trở về trang chủ
+        </Button>
+      </div>
+
       {/* Overlay gradient */}
       <div className="absolute inset-0 z-0 pointer-events-none" style={{ background: 'linear-gradient(135deg, rgba(255,237,213,0.7) 0%, rgba(253,186,116,0.10) 100%)' }} />
-      < Card className="flex w-full max-w-3xl shadow-2xl overflow-hidden rounded-2xl z-10 p-0" >
+      <Card className="flex w-full max-w-3xl shadow-2xl overflow-hidden rounded-2xl z-10 p-0">
         {/* Cột trái: illustration, logo, lời chào, nút đăng ký */}
-        <div className="hidden md:flex flex-col items-center justify-center w-1/2 bg-orange-50 relative p-8" >
+        <div className="hidden md:flex flex-col items-center justify-center w-1/2 bg-orange-50 relative p-8">
           <img src="https://cdn-icons-png.flaticon.com/512/3075/3075977.png" alt="Logo Chef" className="w-16 h-16 mb-4 drop-shadow-lg" />
           <svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg" className="mb-4">
             <ellipse cx="90" cy="90" rx="80" ry="60" fill="#FDBA74" fillOpacity="0.13" />
@@ -58,16 +66,15 @@ const Login = () => {
           </svg>
           <h2 className="text-3xl font-bold text-orange-700 mb-2">Xin chào!</h2>
           <p className="mb-6 text-orange-600">Bạn chưa có tài khoản?</p>
-          <button
-            type="button"
+          <Button
             className="w-full py-2 rounded bg-orange-400 text-white font-semibold hover:bg-orange-500 transition"
             onClick={() => navigate("/register")}
           >
             Đăng ký tài khoản
-          </button>
-        </div >
+          </Button>
+        </div>
         {/* Cột phải: form đăng nhập */}
-        < div className="flex-1 bg-white p-10 flex flex-col justify-center" >
+        <div className="flex-1 bg-white p-10 flex flex-col justify-center">
           <form onSubmit={handleLogin}>
             <h2 className="text-2xl font-bold text-center mb-6 text-orange-800">Đăng nhập</h2>
             <div className="mb-4 relative">
@@ -97,10 +104,10 @@ const Login = () => {
               {loading ? "Đang đăng nhập..." : "Đăng nhập"}
             </Button>
           </form>
-        </ div>
-      </Card >
-    </div >
+        </div>
+      </Card>
+    </div>
   );
 };
 
-export default Login; 
+export default Login;
