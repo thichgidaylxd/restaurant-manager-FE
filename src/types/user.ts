@@ -31,7 +31,7 @@ export interface Employee {
   positionId: string;
   positionName: string;
   image: string;
-  employeeName: string;
+  name: string;
   address: string;
   birthDate: string;
   phoneNumber: string;

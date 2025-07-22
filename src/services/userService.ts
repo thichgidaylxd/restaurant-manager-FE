@@ -57,7 +57,7 @@ export class UserService {
 
   static async updateEmployee(data: any) {
     try {
-      const response = await axiosInstance.put("/employee", data);
+      const response = await axiosInstance.put("/employee", { data });
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || "Lỗi khi cập nhật nhân viên");
@@ -82,18 +82,18 @@ export class UserService {
     }
   }
 
-  static async createPosition(roleName: string) {
+  static async createPosition(name: string) {
     try {
-      const response = await axiosInstance.post("/Position", { roleName });
+      const response = await axiosInstance.post("/position", { name });
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || "Lỗi khi tạo chức vụ");
     }
   }
 
-  static async deletePosition(roleId: string) {
+  static async deletePosition(positionId: string) {
     try {
-      const response = await axiosInstance.delete(`/Position/${roleId}`);
+      const response = await axiosInstance.delete(`/position/${positionId}`);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || "Lỗi khi xóa chức vụ");
