@@ -7,7 +7,7 @@ export class AuthService {
       const response = await axiosInstance.post("/auth/login", account);
       console.log("Login successful:", response.data);
 
-      if (response.data.code == 200 && response.data.data.token) {
+      if (response.data.code == 200) {
 
         localStorage.setItem("token", response.data.data.token);
         localStorage.setItem("user", JSON.stringify(response.data.data.user));

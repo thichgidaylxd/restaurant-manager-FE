@@ -16,7 +16,7 @@ const Login: React.FC = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token != null) {
-      navigate("/Table");
+      navigate("/table");
     }
   }, [navigate]);
 
@@ -25,12 +25,9 @@ const Login: React.FC = () => {
     setLoading(true);
     const res = await AuthService.login({ account, password });
     setLoading(false);
-    if (res.success) {
-      toast({ title: "Đăng nhập thành công!" });
-      navigate("/");
-    } else {
-      toast({ title: res.message || "Đăng nhập thất bại!", variant: "destructive" });
-    }
+    console.log("sdafghjk")
+    navigate("/table");
+
   };
 
   return (
