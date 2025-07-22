@@ -11,7 +11,7 @@ interface DishCardProps {
   onStatusToggle: (id: string) => void;
   onDelete?: (id: string) => void;
   onEdit?: (dish: any) => void; // thêm prop mới
-  role: String;
+  role: string;
 }
 
 const DishCard: React.FC<DishCardProps> = ({
@@ -86,7 +86,7 @@ const DishCard: React.FC<DishCardProps> = ({
             e.stopPropagation();
             onStatusToggle(dish.id);
           }}
-          disabled={!(role === "Nhân viên bếp" || role === "Người quản lý")}
+          disabled={!['Người quản lý', 'Nhân viên bếp'].includes(role)}
           className={`px-4 py-2 rounded-lg font-medium hover:scale-110 hover:shadow-lg ${dish.status === "Đã gọi"
             ? "bg-gray-200 text-gray-700"
             : dish.status === "Đang chuẩn bị"

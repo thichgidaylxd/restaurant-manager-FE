@@ -915,7 +915,7 @@ const TableGrid = () => {
 
               <button
                 onClick={payRequest}
-                disabled={currentTable?.dishes?.length === 0 || !['Người quản lý', 'Nhân viên bếp'].includes(role)}
+                disabled={currentTable?.dishes?.length === 0 || ['Người quản lý', 'Nhân viên thu ngân'].includes(role)}
                 className={`bg-orange-500 text-white px-6 py-3 rounded-lg font-bold text-lg animate-fade-in hover:bg-orange-600 ${currentTable?.dishes?.length === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
               >
                 Tổng: {total.toLocaleString()}.VND

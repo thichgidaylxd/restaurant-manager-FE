@@ -7,6 +7,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
+import { getUserRole } from "@/utils/auth";
 
 const HoaDon = () => {
   const [search, setSearch] = useState("");
@@ -18,6 +19,11 @@ const HoaDon = () => {
   const [error, setError] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showCalendar, setShowCalendar] = useState(false);
+
+  let role;
+  useEffect(() => {
+    role = getUserRole();
+  })
 
   useEffect(() => {
     const fetchInvoices = async () => {
@@ -82,6 +88,7 @@ const HoaDon = () => {
       setInvoices(prev => prev.filter(inv => inv.invoiceId !== invoiceId));
       setShowDetail(false);
     } catch (err: any) {
+      console.log(invoiceId)
       setError(err.message || "Lỗi khi xóa hóa đơn");
     } finally {
       setLoading(false);
@@ -187,7 +194,7 @@ const HoaDon = () => {
                         <button onClick={() => { setSelectedInvoice(inv); setShowDetail(true); }} className="p-2 bg-orange-100 rounded-full hover:bg-orange-200 transition"><Eye className="w-4 h-4 text-orange-600" /></button>
                       </td>
                       <td className="px-4 py-2">
-                        <button onClick={() => handleDeleteInvoice(inv.invoiceId)} className="p-2 bg-red-100 rounded-full hover:bg-red-200 transition" title="Xóa hóa đơn">
+                        <button onClick={() => handleDeleteInvoice(inv.invoiceId)} className="p-2 bg-red-100 rounded-full hover:bg-red-200 transition" title="Xóa hóa đơn" disabled={['Người quản lý'].includes(role)}>
                           <Trash2 className="w-4 h-4 text-red-600" />
                         </button>
                       </td>
