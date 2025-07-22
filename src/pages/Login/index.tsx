@@ -16,7 +16,7 @@ const Login: React.FC = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token != null) {
-      navigate("/");
+      navigate("/Table");
     }
   }, [navigate]);
 

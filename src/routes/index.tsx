@@ -24,7 +24,10 @@ const AppRoutes = () => {
       <Route path="/datban" element={
         ProtectedRoute({ allowedRoles: ["Người quản lý"], children: <DatBan /> })
       } />
-      <Route path="/table" element={ProtectedRoute({ allowedRoles: ["Người quản lý", "Nhân viên", "Nhân viên bếp", "Nhân viên thu ngân"], children: <Table /> })} />
+      <Route path="/table" element={ProtectedRoute({
+        allowedRoles: ["Người quản lý", "Nhân viên", "Nhân viên bếp", "Nhân viên thu ngân"],
+        children: <Table />
+      })} />
       {/* <Route path="/" element={<Table />} /> */}
       <Route path="/logout" element={<Logout />} />
       <Route path="/hoadon" element={ProtectedRoute({ allowedRoles: ["Người quản lý", "Nhân viên"], children: <HoaDon /> })} />

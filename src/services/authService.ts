@@ -43,7 +43,7 @@ export class AuthService {
       localStorage.removeItem("user");
       setTimeout(() => {
         console.log("Token sau khi xóa:", localStorage.getItem("token")); // nên là null
-        window.location.href = "/login";
+        window.location.href = "/";
       }, 100);
     }
     return { success: true };
