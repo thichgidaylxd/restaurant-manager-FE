@@ -22,8 +22,8 @@ const Register = () => {
       return;
     }
     setLoading(true);
-    const role = "Khách hàng";
-    const res = await AuthService.register({ accountName, account, role, password, confirmPassword }); // Giả sử backend nhận phone là email
+    const roleId = "";
+    const res = await AuthService.register({ accountName, account, roleId, password, confirmPassword }); // Giả sử backend nhận phone là email
     setLoading(false);
     if (res.success) {
       toast({ title: "Đăng ký thành công!", description: "Bạn có thể đăng nhập ngay bây giờ." });

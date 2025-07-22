@@ -115,7 +115,7 @@ const TaiKhoan = () => {
                 <TableHead className="text-white font-semibold bg-orange-500">Quyền</TableHead>
                 <TableHead className="text-white font-semibold bg-orange-500">Ngày tạo</TableHead>
               </TableRow>
-            </TableHeader>
+            </TableHeader>``
             <TableBody>
               {users.map((user, idx) => (
                 <TableRow key={user.id} className="bg-white border-b last:rounded-b-lg">
