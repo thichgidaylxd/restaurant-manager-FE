@@ -57,7 +57,7 @@ const TableCard: React.FC<TableCardProps> = ({ table, index, onClick, onDelete }
         className="border-4 border-indigo-900 rounded-xl bg-white cursor-pointer hover:shadow-2xl transition-all duration-300 hover:rotate-1 group hover-glow animate-float"
         onClick={() => {
           onClick(table);
-          window.history.pushState(null, "", `/banan/${table.id}`);
+          window.history.pushState(null, "", `/table/${table.id}`);
         }}
         style={{ animationDelay: `${index * 0.2}s` }}
       >

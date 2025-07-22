@@ -158,7 +158,7 @@ const HoaDon = () => {
             </div>
           </div>
           {/* Invoice Table */}
-          <div className="bg-white rounded-2xl shadow-lg p-6">
+          <div className="max-w-full bg-white rounded-2xl shadow-lg p-6">
             <div className="flex items-center gap-2 mb-4">
               <Receipt className="w-6 h-6 text-blue-500" />
               <h3 className="text-xl font-semibold text-orange-700">Danh sách hóa đơn</h3>
@@ -170,30 +170,31 @@ const HoaDon = () => {
               <table className="min-w-full text-sm">
                 <thead>
                   <tr className="bg-orange-100 text-orange-700">
-                    <th className="px-4 py-2 text-left">Mã hóa đơn</th>
-                    <th className="px-4 py-2 text-left">Bàn</th>
-                    <th className="px-4 py-2 text-left">Thành tiền</th>
-                    <th className="px-4 py-2 text-left">Ngày tạo</th>
-                    <th className="px-4 py-2 text-left">Trạng thái</th>
-                    <th className="px-4 py-2 text-left">Xem</th>
-                    <th className="px-4 py-2 text-left">Xóa</th>
+                    <th className="px-3 py-2 text-left">Mã hóa đơn</th>
+                    <th className="px-3 py-2 text-left">Bàn</th>
+                    <th className="px-3 py-2 text-left">Thành tiền</th>
+                    <th className="px-3 py-2 text-left">Phương thức</th>
+                    <th className="px-3 py-2 text-left">Ngày tạo</th>
+                    <th className="px-3 py-2 text-left">Trạng thái</th>
+                    <th className="px-3 py-2 text-left">Xem</th>
+                    <th className="px-3 py-2 text-left">Xóa</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredInvoices.map((inv: Invoice, idx: number) => (
                     <tr key={idx} className="border-b last:border-0 hover:bg-orange-50 transition">
-                      <td className="px-4 py-2 font-semibold">{inv.invoiceId}</td>
-                      <td className="px-4 py-2 font-semibold">{inv.tableName}</td>
-                      <td className="px-4 py-2 font-semibold">{inv.sum.toLocaleString("vi-VN")} VND</td>
-
-                      <td className="px-4 py-2 font-semibold">{inv.createdAt ? format(new Date(inv.createdAt), "dd/MM/yyyy") : "N/A"}</td>
-                      <td className="px-4 py-2">
+                      <td className="px-3 py-2 font-semibold">{inv.invoiceId}</td>
+                      <td className="px-3 py-2 font-semibold">{inv.tableName}</td>
+                      <td className="px-3 py-2 font-semibold">{inv.sum.toLocaleString("vi-VN")} VND</td>
+                      <td className="px-3 py-2 font-semibold">{inv.payMethod}</td>
+                      <td className="px-3 py-2 font-semibold">{inv.createdAt ? format(new Date(inv.createdAt), "dd/MM/yyyy") : "N/A"}</td>
+                      <td className="px-3 py-2">
                         <span className={`px-3 py-1 rounded-full text-xs font-bold ${inv.status === "paid" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>{inv.status === "paid" ? "Đã thanh toán" : "Chưa thanh toán"}</span>
                       </td>
-                      <td className="px-4 py-2">
+                      <td className="px-3 py-2">
                         <button onClick={() => { setSelectedInvoice(inv); setShowDetail(true); }} className="p-2 bg-orange-100 rounded-full hover:bg-orange-200 transition"><Eye className="w-4 h-4 text-orange-600" /></button>
                       </td>
-                      <td className="px-4 py-2">
+                      <td className="px-3 py-2">
                         <button onClick={() => handleDeleteInvoice(inv.invoiceId)} className="p-2 bg-red-100 rounded-full hover:bg-red-200 transition" title="Xóa hóa đơn" disabled={['Người quản lý'].includes(role)}>
                           <Trash2 className="w-4 h-4 text-red-600" />
                         </button>

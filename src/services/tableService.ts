@@ -19,7 +19,7 @@ interface TableData {
   updateDishStatus: (tableId: string, dishId: string, status: string) => Promise<void>;
   updateDishQuantity: (tableId: string, orderItemUpdateQuantity: { orderItemId: string, quantity: number }) => Promise<void>;
   removeDishFromTable: (tableId: string, orderItemId: string) => Promise<void>;
-  processPayment: (tableId: string) => Promise<void>;
+  processPayment: (tableId: string, payMethod: string) => Promise<void>;
   getTableStatistics: () => Promise<{
     total: number;
     occupied: number;
@@ -281,10 +281,12 @@ export const useTableService = (): TableData => {
     }
   }, []);
 
-  const processPayment = useCallback(async (tableId: string) => {
+  const processPayment = useCallback(async (tableId: string, payMethod: string) => {
     setLoading(true);
     try {
-      const response = await axiosInstance.post(`${BASE_URL}/invoice/${tableId}`);
+      const response = await axiosInstance.post(`${BASE_URL}/invoice/${tableId}`, null, {
+        params: { payMethod }
+      });
       console.log("Processing payment for table:", tableId);
       console.log("Response from POST /invoice:", response.data);
       const result = await response.data;

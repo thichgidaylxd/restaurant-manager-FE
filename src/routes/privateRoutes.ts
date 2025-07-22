@@ -5,11 +5,11 @@ export const privateRoutes = [
     name: "Home",
   },
   {
-    path: "/banan",
+    path: "/table",
     name: "Tables",
   },
   {
-    path: "/banan/:id",
+    path: "/table/:id",
     name: "Table Detail",
   },
   {

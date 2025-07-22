@@ -1,6 +1,7 @@
 import axiosInstance from "@/config/axios";
-
+const BASE_URL = "http://localhost:8081/restaurant/api";
 export class InvoiceService {
+
   static async getAllInvoices() {
     try {
       const response = await axiosInstance.get("/invoice");
@@ -20,9 +21,11 @@ export class InvoiceService {
     }
   }
 
-  static async createInvoice(tableId: string, customerData: { customerName: string; customerPhone: string }) {
+  static async createInvoice(tableId: string, payMethod: string) {
     try {
-      const response = await axiosInstance.post(`/invoice/${tableId}`, customerData);
+      const response = await axiosInstance.post(`${BASE_URL}/invoice/${tableId}`, null, {
+        params: { payMethod }
+      });
       return response.data.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || "Lỗi khi tạo hóa đơn");

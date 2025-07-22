@@ -72,13 +72,13 @@ export class PaymentService {
   static async processPayment(
     tableId: string,
     amount: number,
-    method: "cash" | "transfer",
+    payMethod: "cash" | "transfer",
   ): Promise<any> {
     try {
       const response = await axiosInstance.post(this.BASE_URL, {
         tableId,
         amount,
-        method,
+        payMethod,
         status: "pending",
         createdAt: new Date().toISOString(),
       });
@@ -89,7 +89,7 @@ export class PaymentService {
         id: `payment-${Date.now()}`,
         tableId,
         amount,
-        method,
+        payMethod,
         status: "completed",
         createdAt: new Date().toISOString(),
       };

@@ -380,7 +380,7 @@ const TableGrid = () => {
       setIsMenuView(false);
       setDishError(null);
       setTableError(null);
-      window.history.pushState(null, "", `/banan/${table.id}`);
+      window.history.pushState(null, "", `/table/${table.id}`);
     }, 300);
   };
 
@@ -415,7 +415,7 @@ const TableGrid = () => {
       setAnimating(false);
       setDishError(null);
       setTableError(null);
-      window.history.pushState(null, "", "/banan");
+      window.history.pushState(null, "", "/table");
     }, 300);
   };
 
@@ -473,10 +473,11 @@ const TableGrid = () => {
   const confirmPay = async () => {
     if (selTable) {
       try {
-        await processPayment(selTable);
+
+        await processPayment(selTable, payMethod);
+        console.log(payMethod)
         setShowPayOpt(true);
         fetchTables()
-
         setNotifMessage("Thanh toán thành công!");
         setShowPay(false);
         setShowDelNotif(true);
