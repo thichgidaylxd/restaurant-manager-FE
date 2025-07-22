@@ -26,11 +26,8 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/use-toast";
 import { TableTypeService } from "@/services/tableTypeService";
+import { getUserRole } from "@/utils/auth";
 
-interface TableType {
-  id: string;
-  name: string;
-}
 
 const TableGrid = () => {
   const [query, setQuery] = useState("");
@@ -73,6 +70,7 @@ const TableGrid = () => {
   const [showAddType, setShowAddType] = useState(false);
   const [newTypeName, setNewTypeName] = useState("");
 
+
   const {
     tables = [],
     setTables,
@@ -96,6 +94,9 @@ const TableGrid = () => {
   } = useTableService();
 
 
+  useEffect(() => {
+    const role = getUserRole();
+  })
   // Fetch table types for dropdown
   useEffect(() => {
     const fetchTypes = async () => {
@@ -695,40 +696,10 @@ const TableGrid = () => {
                           >
                             {type.name}
                           </SelectItem>
-                          <button
-                            className="absolute right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-red-500 hover:text-red-700 z-10 bg-white rounded-full p-1 shadow hover:scale-110"
-                            title="Xóa loại bàn"
-                            onClick={async (e) => {
-                              e.stopPropagation();
-                              if (window.confirm(`Bạn có chắc muốn xóa loại bàn '${type.name}'?`)) {
-                                try {
-                                  const res = await TableTypeService.deleteTableType(type.id);
-                                  if (res && res.code === 200) {
-                                    await fetchTableTypes();
-                                    toast({ title: "Đã xóa loại bàn thành công!" });
-                                  } else {
-                                    toast({ title: "Xóa loại bàn thất bại!", variant: "destructive" });
-                                  }
-                                } catch {
-                                  toast({ title: "Lỗi khi xóa loại bàn!", variant: "destructive" });
-                                }
-                              }
-                            }}
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                          </button>
+
                         </div>
                       ))}
                       <SelectSeparator />
-                      <div className="px-2 py-1">
-                        <button
-                          type="button"
-                          className="w-full flex items-center gap-2 px-3 py-2 rounded bg-orange-100 hover:bg-orange-200 text-orange-700 font-semibold transition"
-                          onClick={() => setShowAddType(true)}
-                        >
-                          <Plus className="w-4 h-4" /> Thêm loại bàn
-                        </button>
-                      </div>
                     </SelectContent>
                   </Select>
                 </div>
@@ -921,6 +892,7 @@ const TableGrid = () => {
                         tableId: selTable || "",
                       }}
                       index={i}
+                      role={getUserRole()}
                       isSelected={selDish === d.id}
                       onSelect={setSelDish}
                       onDelete={delDish}
@@ -1013,18 +985,49 @@ const TableGrid = () => {
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Chọn loại bàn" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="animate-zoom-in">
                   {tableTypes.map((type) => (
-                    <SelectItem key={type.id} value={type.id}>
-                      {type.name}
-                    </SelectItem>
+                    <div key={type.id} className="relative group flex items-center">
+                      <SelectItem
+                        value={type.id}
+                        className="hover:bg-orange-100 transition-colors duration-200 pr-10"
+                      >
+                        {type.name}
+                      </SelectItem>
+                      <button
+                        className="absolute right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-red-500 hover:text-red-700 z-10 bg-white rounded-full p-1 shadow hover:scale-110"
+                        title="Xóa loại bàn"
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          if (window.confirm(`Bạn có chắc muốn xóa loại bàn '${type.name}'?`)) {
+                            try {
+                              const res = await TableTypeService.deleteTableType(type.id);
+                              if (res && res.code === 200) {
+                                await fetchTableTypes();
+                                toast({ title: "Đã xóa loại bàn thành công!" });
+                              } else {
+                                toast({ title: "Xóa loại bàn thất bại!", variant: "destructive" });
+                              }
+                            } catch {
+                              toast({ title: "Lỗi khi xóa loại bàn!", variant: "destructive" });
+                            }
+                          }
+                        }}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                      </button>
+                    </div>
                   ))}
                   <SelectSeparator />
                   <div className="px-2 py-1">
                     <button
                       type="button"
                       className="w-full flex items-center gap-2 px-3 py-2 rounded bg-orange-100 hover:bg-orange-200 text-orange-700 font-semibold transition"
-                      onClick={() => setShowAddType(true)}
+                      onClick={() => {
+                        setShowAddType(true)
+                        setShowAddTable(false)
+                        setNewTypeName("");
+                      }}
                     >
                       <Plus className="w-4 h-4" /> Thêm loại bàn
                     </button>
