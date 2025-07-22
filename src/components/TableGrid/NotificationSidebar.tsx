@@ -1,10 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { Bell } from "lucide-react";
 import { Notification } from "@/types/dish";
-import { useState } from "react";
 import axiosInstance from "@/config/axios";
 import dayjs from "dayjs";
-import { on } from "events";
 
 interface NotificationSidebarProps {
   notifications: Notification[];
@@ -21,11 +19,26 @@ const NotificationSidebar: React.FC<NotificationSidebarProps> = ({
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Lọc thông báo theo bàn và sắp xếp theo thời gian
   const tableNotifications = notifications
     .filter((n) => n.tableId === tableId)
     .sort((a, b) => b.timestamp - a.timestamp);
 
-
+  // Hàm lấy trạng thái kế tiếp
+  const getNextStatus = (status: string): string => {
+    switch (status) {
+      case "Đã gọi":
+        return "Đang chuẩn bị";
+      case "Đang chuẩn bị":
+        return "Đã hoàn thành";
+      case "Đã hoàn thành":
+        return "Bị hủy";
+      case "Bị hủy":
+        return "Đã gọi";
+      default:
+        return "Đã gọi";
+    }
+  };
 
   return (
     <div className="flex-1 flex flex-col">
@@ -43,8 +56,12 @@ const NotificationSidebar: React.FC<NotificationSidebarProps> = ({
             >
               <div className="w-2 h-2 rounded-full mt-2 bg-orange-500"></div>
               <div className="flex-1">
-                <p className="text-sm text-gray-800">{n.dishName} {n.status}</p>
-                <p className="text-xs text-gray-500">{dayjs(n.timestamp).format("HH:mm DD/MM/YYYY")}</p>
+                <p className="text-sm text-gray-800">
+                  {n.dishName} → {getNextStatus(n.status)}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {dayjs(n.timestamp).format("HH:mm DD/MM/YYYY")}
+                </p>
               </div>
             </div>
           ))}
