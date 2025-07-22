@@ -13,12 +13,22 @@ export class UserService {
     return { success: true };
   }
 
+  static async getPosition() {
+    try {
+      const response = await axiosInstance.get("/position");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching position:", error);
+      throw error;
+    }
+  }
+
   static async getRoles() {
     try {
       const response = await axiosInstance.get("/role");
       return response.data;
     } catch (error) {
-      console.error("Error fetching roles:", error);
+      console.error("Error fetching position:", error);
       throw error;
     }
   }
@@ -34,7 +44,9 @@ export class UserService {
   }
 
   static async createEmployee(data: any) {
+    console.log(data);
     const response = await axiosInstance.post("/employee", data);
+
     return response.data;
   }
 
