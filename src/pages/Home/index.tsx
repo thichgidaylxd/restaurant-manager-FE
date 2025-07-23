@@ -10,7 +10,7 @@ const Home: React.FC = () => {
         <Link
           to="/login"
           className="bg-orange-500 text-white font-semibold px-4 py-2 rounded-full hover:bg-orange-600 transition"
-        >git
+        >
           Đăng nhập
         </Link>
         <Link
