@@ -7,18 +7,12 @@ interface Revenue {
     invoiceCount: number;
 }
 
-interface ApiResponse<T> {
-    code: number;
-    status: string;
-    message: string;
-    data: T;
-}
 
 export class RevenueService {
     // Lấy doanh thu theo ngày (trả về một đối tượng Revenue)
     static async getRevenueByDay(date: string) {
         try {
-            const response = await axiosInstance.get<ApiResponse<Revenue>>("/revenue/day", {
+            const response = await axiosInstance.get("/revenue/day", {
                 params: { date },
             });
             console.log("Response from GET /revenue/day:", response.data);
@@ -31,7 +25,7 @@ export class RevenueService {
     // Lấy doanh thu theo tuần chứa ngày (trả về mảng Revenue[])
     static async getRevenueByWeek(date: string) {
         try {
-            const response = await axiosInstance.get<ApiResponse<Revenue[]>>("/revenue/week", {
+            const response = await axiosInstance.get("/revenue/week", {
                 params: { date },
             });
             console.log("Response from GET /revenue/week:", response.data);
@@ -44,7 +38,7 @@ export class RevenueService {
     // Lấy doanh thu theo tháng (trả về mảng Revenue[])
     static async getRevenueByMonth(month: string) {
         try {
-            const response = await axiosInstance.get<ApiResponse<Revenue[]>>("/revenue/month", {
+            const response = await axiosInstance.get("/revenue/month", {
                 params: { month },
             });
             console.log("Response from GET /revenue/month:", response.data);

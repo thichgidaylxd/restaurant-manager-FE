@@ -143,9 +143,17 @@ const NhanVien = () => {
       });
       setShowAdd(false);
       form.reset();
-      // reload employees
+
+
+
       const res = await UserService.getAllEmployees();
-      setEmployees(res.data || res || []);
+      const formatted = (res.data || []).map((emp) => ({
+        ...emp,
+        image: emp.image
+          ? `data:image/jpeg;base64,${emp.image}`
+          : "default-avatar-url.jpg", // nếu ảnh null
+      }));
+      setEmployees(formatted);
     } catch (err: any) {
       alert(err.message || "Lỗi khi thêm nhân viên");
     }
@@ -211,9 +219,14 @@ const NhanVien = () => {
     if (!window.confirm("Bạn có chắc chắn muốn xóa nhân viên này?")) return;
     try {
       await UserService.deleteEmployee(id);
-      // reload employees
       const res = await UserService.getAllEmployees();
-      setEmployees(res.data || res || []);
+      const formatted = (res.data || []).map((emp) => ({
+        ...emp,
+        image: emp.image
+          ? `data:image/jpeg;base64,${emp.image}`
+          : "default-avatar-url.jpg", // nếu ảnh null
+      }));
+      setEmployees(formatted);
     } catch (err: any) {
       alert(err.message || "Lỗi khi xóa nhân viên");
     }
