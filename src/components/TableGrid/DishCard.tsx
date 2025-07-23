@@ -23,7 +23,7 @@ const DishCard: React.FC<DishCardProps> = ({
   onQuantityChange,
   onStatusToggle,
   onDelete,
-  onEdit,
+ 
 }) => {
   return (
     <div
