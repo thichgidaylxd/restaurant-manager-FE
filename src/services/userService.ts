@@ -1,6 +1,5 @@
-import { Position } from './../types/user';
+
 import axiosInstance from "@/config/axios";
-import { User } from "@/types/user";
 
 // User service
 export class UserService {

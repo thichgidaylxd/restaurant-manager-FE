@@ -2,7 +2,7 @@ export interface User {
   id: string;
   account: string;
   accountName: string;
-  role: string;
+  roleName: string;
   createdAt: string;
 }
 

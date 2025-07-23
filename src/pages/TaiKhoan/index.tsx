@@ -11,12 +11,6 @@ import Sidebar from "@/components/layout/Sidebar";
 import { User, Role } from "@/types/user";
 import { UserService } from "@/services/userService";
 
-const mockData = Array.from({ length: 12 }).map((_, i) => ({
-  name: "Loại tài khoản",
-  phone: "Số điện thoại",
-  role: "Quyền",
-  createdAt: "Ngày tạo",
-}));
 
 const TaiKhoan = () => {
   const [showAdd, setShowAdd] = useState(false);
@@ -121,7 +115,7 @@ const TaiKhoan = () => {
                 <TableRow key={user.id} className="bg-white border-b last:rounded-b-lg">
                   <TableCell>{user.accountName}</TableCell>
                   <TableCell>{user.account}</TableCell>
-                  <TableCell>{user.role}</TableCell>
+                  <TableCell>{user.roleName}</TableCell>
                   <TableCell>{user.createdAt}</TableCell>
                 </TableRow>
               ))}
