@@ -5,16 +5,15 @@ export class AuthService {
   static async login(account: { account: string, password: string }) {
     try {
       const response = await axiosInstance.post("/auth/login", account);
-      console.log("Login successful:", response.data);
-
       if (response.data.code == 200) {
 
         localStorage.setItem("token", response.data.data.token);
         localStorage.setItem("user", JSON.stringify(response.data.data.user));
+
         return {
           success: true,
-          user: response.data.user,
-          token: response.data.token,
+          user: response.data.data.user,
+          token: response.data.data.token,
         };
       }
 

@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Table from "@/pages/Table";
 import HoaDon from "@/pages/HoaDon";
 import ThucDon from "@/pages/ThucDon";
@@ -12,33 +12,92 @@ import DatBan from "@/pages/DatBan";
 import NotFoundPage from "@/pages/NotFoundPage";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Home from "@/pages/Home";
-
-
-// App Router - Main routing configuration
+import CustomerPage from "@/pages/KhachHang/khachhang";
 
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* All routes are now public - no authentication required */}
+      {/* Public Routes */}
       <Route path="/" element={<Home />} />
-      <Route path="/datban" element={
-        ProtectedRoute({ allowedRoles: ["Người quản lý"], children: <DatBan /> })
-      } />
-      <Route path="/table" element={ProtectedRoute({
-        allowedRoles: ["Người quản lý", "Nhân viên", "Nhân viên bếp", "Nhân viên thu ngân"],
-        children: <Table />
-      })} />
-      {/* <Route path="/" element={<Table />} /> */}
-      <Route path="/logout" element={<Logout />} />
-      <Route path="/hoadon" element={ProtectedRoute({ allowedRoles: ["Người quản lý", "Nhân viên"], children: <HoaDon /> })} />
-      <Route path="/thucdon" element={ProtectedRoute({ allowedRoles: ["Người quản lý"], children: <ThucDon /> })} />
-      <Route path="/doanhthu" element={ProtectedRoute({ allowedRoles: ["Người quản lý"], children: <DoanhThu /> })} />
-      <Route path="/nhanvien" element={ProtectedRoute({ allowedRoles: ["Người quản lý"], children: <NhanVien /> })} />
-      <Route path="/taikhoan" element={ProtectedRoute({ allowedRoles: ["Người quản lý"], children: <TaiKhoan /> })} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/logout" element={<Logout />} />
 
-      {/* <Route path="*" element={<NotFoundPage />} /> */}
+      {/* Protected Routes */}
+      <Route
+        path="/table"
+        element={
+          <ProtectedRoute allowedRoles={["Người quản lý", "Nhân viên", "Nhân viên bếp", "Nhân viên thu ngân"]}>
+            <Table />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/ghinhandatban"
+        element={
+          <ProtectedRoute allowedRoles={["Người quản lý"]}>
+            <DatBan />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/invoices"
+        element={
+          <ProtectedRoute allowedRoles={["Người quản lý", "Nhân viên", "Nhân viên thu ngân"]}>
+            <HoaDon />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/dishes"
+        element={
+          <ProtectedRoute allowedRoles={["Người quản lý"]}>
+            <ThucDon />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/revenue"
+        element={
+          <ProtectedRoute allowedRoles={["Người quản lý"]}>
+            <DoanhThu />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/employee"
+        element={
+          <ProtectedRoute allowedRoles={["Người quản lý"]}>
+            <NhanVien />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/account"
+        element={
+          <ProtectedRoute allowedRoles={["Người quản lý"]}>
+            <TaiKhoan />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/customer"
+        element={
+          <ProtectedRoute allowedRoles={["Khách hàng"]}>
+            <CustomerPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Fallback route */}
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 };

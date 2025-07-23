@@ -20,11 +20,14 @@ const HoaDon = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showCalendar, setShowCalendar] = useState(false);
 
-  let role;
-  useEffect(() => {
-    role = getUserRole();
-  })
 
+  const [isManager, setIsManager] = useState(false);
+
+  useEffect(() => {
+    const role = getUserRole();
+    const normalizedRole = role?.normalize("NFC").trim();
+    setIsManager(normalizedRole === "Người quản lý");
+  }, []);
   useEffect(() => {
     const fetchInvoices = async () => {
       setLoading(true);
@@ -177,7 +180,6 @@ const HoaDon = () => {
                     <th className="px-3 py-2 text-left">Ngày tạo</th>
                     <th className="px-3 py-2 text-left">Trạng thái</th>
                     <th className="px-3 py-2 text-left">Xem</th>
-                    <th className="px-3 py-2 text-left">Xóa</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -193,11 +195,6 @@ const HoaDon = () => {
                       </td>
                       <td className="px-3 py-2">
                         <button onClick={() => { setSelectedInvoice(inv); setShowDetail(true); }} className="p-2 bg-orange-100 rounded-full hover:bg-orange-200 transition"><Eye className="w-4 h-4 text-orange-600" /></button>
-                      </td>
-                      <td className="px-3 py-2">
-                        <button onClick={() => handleDeleteInvoice(inv.invoiceId)} className="p-2 bg-red-100 rounded-full hover:bg-red-200 transition" title="Xóa hóa đơn" disabled={['Người quản lý'].includes(role)}>
-                          <Trash2 className="w-4 h-4 text-red-600" />
-                        </button>
                       </td>
                     </tr>
                   ))}
@@ -245,20 +242,33 @@ const HoaDon = () => {
                 <div className="flex justify-end gap-8 text-base font-semibold">
                   <div>Tổng cộng: <span className="text-green-600">{selectedInvoice.invoiceDishResponses?.reduce((sum: number, item: InvoiceDish) => sum + (item.price || 0) * (item.quantity || 0), 0).toLocaleString()} VND</span></div>
                 </div>
-                <div className="flex justify-end mt-4">
-                  <button className="px-4 py-2 rounded-lg bg-blue-500 text-white font-semibold hover:bg-blue-600 transition">In hóa đơn</button>
-                  <button
-                    onClick={() => exportToPDF(selectedInvoice)}
-                    className="ml-2 px-4 py-2 rounded-lg bg-gray-300 text-gray-700 font-semibold hover:bg-gray-400 transition"
-                  >
-                    Xuất PDF
-                  </button>
-                  <button
-                    onClick={() => handleDeleteInvoice(selectedInvoice.invoiceId)}
-                    className="ml-2 px-4 py-2 rounded-lg bg-red-500 text-white font-semibold hover:bg-red-600 transition"
-                  >
-                    Xóa hóa đơn
-                  </button>
+                <div className="w-full flex mt-4">
+                  <div className="flex justify-start w-1/2">
+                    {/* Nút nằm sát trái */}
+                    {isManager && (
+                      <button
+                        onClick={() => handleDeleteInvoice(selectedInvoice.invoiceId)}
+                        className="p-2 bg-red-100 rounded-full hover:bg-red-200 transition"
+                        title="Xóa hóa đơn"
+                      >
+                        <Trash2 className="w-24 h-4 text-red-600 " />
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="flex justify-end w-1/2">
+                    <button className="px-4 py-2 rounded-lg bg-blue-500 text-white font-semibold hover:bg-blue-600 transition">In hóa đơn</button>
+                    <button
+                      onClick={() => exportToPDF(selectedInvoice)}
+                      className="ml-2 px-4 py-2 rounded-lg bg-gray-300 text-gray-700 font-semibold hover:bg-gray-400 transition"
+                    >
+                      Xuất PDF
+                    </button>
+
+                  </div >
+
+
+
                 </div>
               </div>
             </div>
@@ -266,7 +276,7 @@ const HoaDon = () => {
           )}
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 

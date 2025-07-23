@@ -1,8 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FaUtensils } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 const Home: React.FC = () => {
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token != null)
+      localStorage.removeItem("token");
+    localStorage.removeItem("user")
+  })
   return (
     <div className="w-full h-screen bg-orange-50 text-foreground relative">
       {/* Login/Register Buttons */}

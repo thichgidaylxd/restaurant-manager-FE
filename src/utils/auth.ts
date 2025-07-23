@@ -6,8 +6,6 @@ interface TokenPayload {
 
 export function getUserRole(): string | null {
     const token = localStorage.getItem("token");
-    if (!token) return null;
-
     try {
         const decoded = jwtDecode<TokenPayload>(token);
         return decoded.role;

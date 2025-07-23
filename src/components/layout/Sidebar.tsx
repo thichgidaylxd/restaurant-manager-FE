@@ -21,14 +21,14 @@ const Sidebar = () => {
 
   const commonLinks = [
     { path: "/table", label: "Bàn ăn", icon: "📁" },
-    { path: "/hoadon", label: "Hóa đơn", icon: "📋" }
+    { path: "/invoices", label: "Hóa đơn", icon: "📋" }
   ];
 
   const managerLinks = [
-    { path: "/thucdon", label: "Thực đơn", icon: "🍽️" },
-    { path: "/doanhthu", label: "Doanh thu", icon: "💰" },
-    { path: "/nhanvien", label: "Nhân viên", icon: "👥" },
-    { path: "/taikhoan", label: "Tài khoản", icon: "👤" }
+    { path: "/dishes", label: "Thực đơn", icon: "🍽️" },
+    { path: "/revenue", label: "Doanh thu", icon: "💰" },
+    { path: "/employee", label: "Nhân viên", icon: "👥" },
+    { path: "/account", label: "Tài khoản", icon: "👤" }
   ];
 
   const settingsLink = { path: "/caidat", label: "Cài đặt", icon: "⚙️" };

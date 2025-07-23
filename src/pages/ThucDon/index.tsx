@@ -553,9 +553,34 @@ const ThucDon = () => {
                     </SelectTrigger>
                     <SelectContent>
                       {dishTypes.map((type) => (
-                        <SelectItem key={type.id} value={type.id}>
-                          {type.name}
-                        </SelectItem>
+                        <div key={type.id} className="relative group flex items-center">
+                          <SelectItem key={type.id} value={type.id}>
+                            {type.name}
+                          </SelectItem>
+
+                          <button
+                            className="absolute right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-red-500 hover:text-red-700 z-10 bg-white rounded-full p-1 shadow hover:scale-110"
+                            title="Xóa loại bàn"
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              if (window.confirm(`Bạn có chắc muốn xóa loại bàn '${type.name}'?`)) {
+                                try {
+                                  const res = await MenuService.deleteDishType(type.id);
+                                  if (res.code == 200) {
+                                    const typesResponse = await MenuService.getAllDishTypes();
+                                    setDishTypes(typesResponse.data || []);
+                                  } else {
+                                    toast({ title: "Xóa loại bàn thất bại!", variant: "destructive" });
+                                  }
+                                } catch {
+                                  toast({ title: "Lỗi khi xóa loại bàn!", variant: "destructive" });
+                                }
+                              }
+                            }}
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                          </button>
+                        </div>
                       ))}
                       <SelectSeparator />
                       <div className="px-2 py-1">

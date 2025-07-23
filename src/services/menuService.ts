@@ -22,7 +22,7 @@ export class MenuService {
 
   static async getAllDishTypes() {
     try {
-      const response = await axiosInstance.get(`/dishes-type`);
+      const response = await axiosInstance.get(`/dish-types`);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || "Lỗi khi lấy tất cả loại món");
@@ -31,11 +31,16 @@ export class MenuService {
 
   static async createDishType(name: string) {
     try {
-      const response = await axiosInstance.post(`/dishes-type`, { name });
+      const response = await axiosInstance.post(`/dish-types`, { name });
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || "Lỗi khi tạo loại món");
     }
+  }
+
+  static async deleteDishType(id: string) {
+    const res = await axiosInstance.delete(`/dish-types/${id}`);
+    return res.data;
   }
   static async createDish(dishData: {
     dishType: { id: string; name: string };

@@ -20,10 +20,10 @@ const NhanVien = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showEdit, setShowEdit] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
-  const [roles, setRoles] = useState<{ id: string; name: string }[]>([]);
+  const [positionId, setPositionId] = useState<{ id: string; name: string }[]>([]);
   const [positionName, setPositionName] = useState("");
-  const [roleLoading, setRoleLoading] = useState(false);
-  const [roleError, setRoleError] = useState("");
+  const [positionLoading, setpositionLoading] = useState(false);
+  const [positionError, setpositionError] = useState("");
 
   useEffect(() => {
     let isMounted = true; // bảo vệ tránh setState khi đã unmounted
@@ -75,39 +75,39 @@ const NhanVien = () => {
     fetchPositions();
   }, []);
 
-  const fetchRoles = async () => {
-    setRoleLoading(true);
-    setRoleError("");
+  const fetchposition = async () => {
+    setpositionLoading(true);
+    setpositionError("");
     try {
       const res = await UserService.getAllPositions();
-      setRoles(res.data || res || []);
+      setPositionId(res.data || res || []);
     } catch (err: any) {
-      setRoleError(err.message || "Lỗi khi lấy danh sách chức vụ");
+      setpositionError(err.message || "Lỗi khi lấy danh sách chức vụ");
     } finally {
-      setRoleLoading(false);
+      setpositionLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchRoles();
+    fetchposition();
   }, []);
 
-  const handleAddRole = async () => {
+  const handleAddposition = async () => {
     if (!positionName) return;
     try {
       await UserService.createPosition(positionName);
       setPositionName("");
-      fetchRoles();
+      fetchposition();
     } catch (err: any) {
       alert(err.message || "Lỗi khi thêm chức vụ");
     }
   };
 
-  const handleDeleteRole = async (id: string) => {
+  const handleDeleteposition = async (id: string) => {
     if (!window.confirm("Bạn có chắc chắn muốn xóa chức vụ này?")) return;
     try {
       await UserService.deletePosition(id);
-      fetchRoles();
+      fetchposition();
     } catch (err: any) {
       alert(err.message || "Lỗi khi xóa chức vụ");
     }
@@ -290,15 +290,15 @@ const NhanVien = () => {
           <div className="mb-2 text-lg font-bold text-orange-700">Quản lý chức vụ</div>
           <div className="flex gap-2 mb-4">
             <Input value={positionName} onChange={e => setPositionName(e.target.value)} placeholder="Tên chức vụ mới" className="w-64" />
-            <Button onClick={handleAddRole}>Thêm chức vụ</Button>
+            <Button onClick={handleAddposition}>Thêm chức vụ</Button>
           </div>
-          {roleLoading && <div>Đang tải...</div>}
-          {roleError && <div className="text-red-600">{roleError}</div>}
+          {positionLoading && <div>Đang tải...</div>}
+          {positionError && <div className="text-red-600">{positionError}</div>}
           <div className="flex flex-wrap gap-2">
-            {roles.map(role => (
-              <div key={role.id} className="flex items-center gap-2 bg-orange-100 rounded-lg px-3 py-1">
-                <span className="font-medium text-orange-700">{role.name}</span>
-                <Button size="sm" variant="destructive" onClick={() => handleDeleteRole(role.id)}>Xóa</Button>
+            {positionId.map(position => (
+              <div key={position.id} className="flex items-center gap-2 bg-orange-100 rounded-lg px-3 py-1">
+                <span className="font-medium text-orange-700">{position.name}</span>
+                <Button size="sm" variant="destructive" onClick={() => handleDeleteposition(position.id)}>Xóa</Button>
               </div>
             ))}
           </div>

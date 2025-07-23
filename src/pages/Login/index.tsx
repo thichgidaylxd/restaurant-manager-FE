@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { Card } from "@/components/ui/card";
 import { FaPhoneAlt, FaLock } from "react-icons/fa";
+import { getUserRole } from "@/utils/auth";
 
 const Login: React.FC = () => {
   const [account, setAccount] = useState("");
@@ -22,11 +23,38 @@ const Login: React.FC = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    const res = await AuthService.login({ account, password });
-    setLoading(false);
-    console.log("sdafghjk")
-    navigate("/table");
+    try {
+      const res = await AuthService.login({ account, password });
+      setLoading(false);
+
+      if (res.success && res.token) {
+        const role = getUserRole();
+        switch (role) {
+          case "Người quản lý":
+            navigate("/table");
+            break;
+          case "Nhân viên":
+            navigate("/table");
+            break;
+          case "Nhân viên bếp":
+            navigate("/table");
+            break;
+          case "Nhân viên thu ngân":
+            navigate("/table");
+            break;
+          case "Khách hàng":
+            navigate("/customer"); // sau này code lên giao diện khác
+            break;
+          default:
+            navigate("/notfoundpage");
+        }
+      } else {
+        toast({ title: "Đăng nhập thất bại", description: res.message });
+      }
+    } catch {
+      navigate("/notfoundpage")
+    }
+
 
   };
 
