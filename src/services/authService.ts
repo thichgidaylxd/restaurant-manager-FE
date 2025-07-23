@@ -31,13 +31,10 @@ export class AuthService {
 
   static async logout() {
     try {
-      // Call logout endpoint if needed
       await axiosInstance.post("/auth/logout");
     } catch (error) {
-      // Continue with logout even if server call fails
       console.warn("Logout server call failed:", error);
     } finally {
-      // Always clear local storage
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       setTimeout(() => {
@@ -77,13 +74,10 @@ export class AuthService {
         return null;
       }
 
-      // Try to get user from localStorage first
       const storedUser = localStorage.getItem("user");
       if (storedUser) {
         return JSON.parse(storedUser);
       }
-
-      // If not in localStorage, fetch from server
       const response = await axiosInstance.get("/auth/me");
 
       if (response.data.success && response.data.user) {

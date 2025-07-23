@@ -25,7 +25,7 @@ interface TableData {
     occupied: number;
     available: number;
     reserved: number;
-    revenue: number;
+    payment: number;
   }>;
   getTableById: (tableId: string) => RestaurantTable | undefined;
   fetchTableDishes: (tableId: string) => Promise<void>;
@@ -314,13 +314,13 @@ export const useTableService = (): TableData => {
           occupied: data.filter((t: RestaurantTable) => t.status === "Đang sử dụng").length,
           available: data.filter((t: RestaurantTable) => t.status === "Trống").length,
           reserved: data.filter((t: RestaurantTable) => t.status === "Đã đặt").length,
-          revenue: 0, // Cần API invoices để tính
+          payment: data.filter((t: RestaurantTable) => t.status === "Chờ thanh toán").length,
         };
       }
-      return { total: 0, occupied: 0, available: 0, reserved: 0, revenue: 0 };
+      return { total: 0, occupied: 0, available: 0, reserved: 0, payment: 0 };
     } catch (err) {
       console.error("Lỗi khi lấy thống kê:", err);
-      return { total: 0, occupied: 0, available: 0, reserved: 0, revenue: 0 };
+      return { total: 0, occupied: 0, available: 0, reserved: 0, payment: 0 };
     }
   };
 

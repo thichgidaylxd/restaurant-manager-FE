@@ -27,6 +27,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { toast } from "@/components/ui/use-toast";
 import { TableTypeService } from "@/services/tableTypeService";
 import { getUserRole } from "@/utils/auth";
+import { RevenueService } from "@/services/revenueService";
 
 
 const TableGrid = () => {
@@ -46,12 +47,12 @@ const TableGrid = () => {
   const [payMethod, setPayMethod] = useState<"cash" | "transfer" | null>(null);
   const [showPayOpt, setShowPayOpt] = useState(false);
   const [qrUrl, setQrUrl] = useState("");
-  const [tableStats, setTableStats] = useState({
+  const [tableStatus, settableStatus] = useState({
     total: 0,
     occupied: 0,
     available: 0,
     reserved: 0,
-    revenue: 0,
+    payment: 0,
   });
   const [dishError, setDishError] = useState<string | null>(null);
   const [tableError, setTableError] = useState<string | null>(null);
@@ -69,7 +70,8 @@ const TableGrid = () => {
   const [selTableDelete, setSelTableDelete] = useState<string | null>(null);
   const [showAddType, setShowAddType] = useState(false);
   const [newTypeName, setNewTypeName] = useState("");
-
+  const [totalToday, setTotalToday] = useState<number>(0);
+  const [error, setError] = useState("");
 
   const {
     tables = [],
@@ -108,6 +110,26 @@ const TableGrid = () => {
     };
     fetchTypes();
   }, [fetchTableTypes]);
+
+  function getToday() {
+    const d = new Date();
+    return d.toISOString().slice(0, 10);
+  }
+  useEffect(() => {
+    const fetchRevenueToday = async () => {
+      try {
+        const response = await RevenueService.getRevenueByDay(getToday());
+        if (response.code === 200) {
+          setTotalToday(response.data?.totalAmount || 0);
+        } else {
+          setError("Dữ liệu doanh thu ngày không hợp lệ");
+        }
+      } catch (err: any) {
+        setError(err.message || "Không thể tải dữ liệu doanh thu ngày");
+      }
+    };
+    fetchRevenueToday();
+  }, []);
 
   const recordPaymentRequestTime = async () => {
     await updateTableStatus(selTable, "Chờ thanh toán");
@@ -149,10 +171,10 @@ const TableGrid = () => {
   const loadTableStatistics = async () => {
     try {
       const stats = await getTableStatistics();
-      setTableStats(stats || { total: 0, occupied: 0, available: 0, reserved: 0, revenue: 0 });
+      settableStatus(stats || { total: 0, occupied: 0, available: 0, reserved: 0, payment: 0 });
     } catch (err) {
       console.error("Lỗi khi tải thống kê bàn:", err);
-      setTableStats({ total: 0, occupied: 0, available: 0, reserved: 0, revenue: 0 });
+      settableStatus({ total: 0, occupied: 0, available: 0, reserved: 0, payment: 0 });
     }
   };
 
@@ -577,7 +599,7 @@ const TableGrid = () => {
                         Đang sử dụng:
                       </div>
                       <div className="text-xl font-bold animate-heartbeat">
-                        {tableStats.occupied}
+                        {tableStatus.occupied}
                       </div>
                     </div>
                     <div className="absolute top-1 right-1 w-2 h-2 bg-red-400 rounded-full animate-ping"></div>
@@ -598,11 +620,34 @@ const TableGrid = () => {
                         className="text-xl font-bold animate-bounce-in"
                         style={{ animationDelay: "0.4s" }}
                       >
-                        {tableStats.available}
+                        {tableStatus.available}
                       </div>
                     </div>
                     <div className="absolute top-1 right-1 w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                   </div>
+                  {/* <div
+                    className="bg-amber-700 text-white px-6 py-4 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 animate-fade-in-up hover-lift animate-float relative overflow-hidden"
+                    style={{ animationDelay: "0.2s" }}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-600 opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+                    <div className="relative z-10">
+                      <div
+                        className="text-sm opacity-90 animate-fade-in-up"
+                        style={{ animationDelay: "0.3s" }}
+                      >
+                        Chờ thanh toán:
+                      </div>
+                      <div
+                        className="text-xl font-bold animate-bounce-in"
+                        style={{ animationDelay: "0.4s" }}
+                      >
+                        {tableStatus.payment}
+                      </div>
+                    </div>
+                    <div className="absolute top-1 right-1 w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  </div> */}
+
+
                   <div
                     className="bg-amber-600 text-white px-6 py-4 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 animate-fade-in-up hover-lift hover-rotate relative overflow-hidden"
                     style={{ animationDelay: "0.3s" }}
@@ -619,7 +664,7 @@ const TableGrid = () => {
                         className="text-xl font-bold animate-zoom-in"
                         style={{ animationDelay: "0.5s" }}
                       >
-                        {tableStats.total}
+                        {tableStatus.total}
                       </div>
                     </div>
                     <div
@@ -641,7 +686,7 @@ const TableGrid = () => {
                       Doanh thu:
                     </div>
                     <div className="text-xl font-bold animate-heartbeat">
-                      {tableStats.revenue.toLocaleString()}.VND
+                      {totalToday.toLocaleString()}.VND
                     </div>
                   </div>
                   <div className="absolute top-2 right-2 text-yellow-300 animate-rotate-slow">
