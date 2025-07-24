@@ -23,7 +23,6 @@ const DishCard: React.FC<DishCardProps> = ({
   onQuantityChange,
   onStatusToggle,
   onDelete,
- 
 }) => {
   return (
     <div
@@ -86,7 +85,7 @@ const DishCard: React.FC<DishCardProps> = ({
             e.stopPropagation();
             onStatusToggle(dish.id);
           }}
-          disabled={!['Người quản lý', 'Nhân viên bếp'].includes(role)}
+          disabled={!['Người quản lý', 'Nhân viên bếp', 'Nhân viên'].includes(role)}
           className={`px-4 py-2 rounded-lg font-medium hover:scale-110 hover:shadow-lg ${dish.status === "Đã gọi"
             ? "bg-gray-200 text-gray-700"
             : dish.status === "Đang chuẩn bị"

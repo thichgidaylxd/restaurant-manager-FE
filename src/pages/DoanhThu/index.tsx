@@ -207,10 +207,6 @@ const DoanhThu: React.FC = () => {
     ],
   };
 
-  const revenueHeaderImg = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
-  const todayCardImg = "https://cdn-icons-png.flaticon.com/512/2921/2921822.png";
-  const weekCardImg = "https://cdn-icons-png.flaticon.com/512/2921/2921820.png";
-  const monthCardImg = "https://cdn-icons-png.flaticon.com/512/2921/2921817.png";
   const chartBgImg = "https://cdn-icons-png.flaticon.com/512/1828/1828884.png";
   const tableBgImg = "https://cdn-icons-png.flaticon.com/512/3135/3135768.png";
   const restaurantBg = "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1500&q=80";
@@ -219,8 +215,6 @@ const DoanhThu: React.FC = () => {
   const billIcon = "https://cdn-icons-png.flaticon.com/512/3075/3075975.png";
   const foodIcon = "https://cdn-icons-png.flaticon.com/512/3075/3075974.png";
   const trophyIcon = "https://cdn-icons-png.flaticon.com/512/1828/1828884.png";
-  const sparkleIcon = "https://cdn-icons-png.flaticon.com/512/616/616489.png";
-  const bestSellerIcon = "https://cdn-icons-png.flaticon.com/512/1828/1828970.png";
 
   return (
     <div
