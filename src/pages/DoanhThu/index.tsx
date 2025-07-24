@@ -323,11 +323,9 @@ const DoanhThu: React.FC = () => {
                       onError={(e) => { (e.target as HTMLImageElement).src = defaultDishImages[0]; }}
                     />
                     {idx === 0 && (
-                      <img src={bestSellerIcon} alt="best seller" className="absolute top-1 right-1 w-8 h-8 z-10" />
+                      <img src={trophyIcon} alt="best seller" className="absolute top-1 right-1 w-6 h-6 z-10" />
                     )}
-                    {idx === 0 && (
-                      <img src={sparkleIcon} alt="sparkle" className="absolute left-1 bottom-1 w-7 h-7 z-10 opacity-80 animate-pulse" />
-                    )}
+
                   </div>
                   <div className="font-bold text-lg text-orange-700 mb-1 text-center truncate w-full flex items-center justify-center gap-2">
                     {idx === 0 && <img src={trophyIcon} alt="trophy" className="w-6 h-6" />} {dish.name}
