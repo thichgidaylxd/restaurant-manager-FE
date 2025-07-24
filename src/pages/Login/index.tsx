@@ -14,12 +14,7 @@ const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token != null) {
-      navigate("/table");
-    }
-  }, [navigate]);
+
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
