@@ -71,7 +71,6 @@ const DoanhThu: React.FC = () => {
     "https://cdn.tgdd.vn/2021/06/content/bunbo-800x450.jpg",
   ];
 
-  // Lấy doanh thu ngày
   useEffect(() => {
     const fetchRevenueToday = async () => {
       try {
@@ -89,7 +88,6 @@ const DoanhThu: React.FC = () => {
     fetchRevenueToday();
   }, []);
 
-  // Lấy doanh thu tuần
   useEffect(() => {
     const fetchRevenueWeek = async () => {
       try {
@@ -108,7 +106,6 @@ const DoanhThu: React.FC = () => {
     fetchRevenueWeek();
   }, []);
 
-  // Lấy doanh thu tháng
   useEffect(() => {
     const fetchRevenueMonth = async () => {
       try {
@@ -127,7 +124,6 @@ const DoanhThu: React.FC = () => {
     fetchRevenueMonth();
   }, []);
 
-  // Lấy dữ liệu cho biểu đồ và bảng dựa trên selectedDate và filterType
   useEffect(() => {
     const fetchRevenue = async () => {
       setLoading(true);
@@ -137,7 +133,7 @@ const DoanhThu: React.FC = () => {
         if (filterType === 'day') {
           response = await RevenueService.getRevenueByDay(selectedDate || getToday());
           if (response.code === 200) {
-            setRevenueList([response.data]); // Chuyển đối tượng thành mảng
+            setRevenueList([response.data]);
           }
         } else if (filterType === 'week') {
           response = await RevenueService.getRevenueByWeek(selectedDate || getToday());
@@ -162,7 +158,6 @@ const DoanhThu: React.FC = () => {
     fetchRevenue();
   }, [selectedDate, filterType]);
 
-  // Lấy top món bán chạy
   useEffect(() => {
     const fetchTopDishes = async () => {
       try {
@@ -198,7 +193,6 @@ const DoanhThu: React.FC = () => {
     fetchTopDishes();
   }, []);
 
-  // Dữ liệu biểu đồ
   const chartData = {
     labels: revenueList.sort((a, b) => a.date.localeCompare(b.date)).map(r => r.date),
     datasets: [
@@ -246,7 +240,6 @@ const DoanhThu: React.FC = () => {
               <img src={trophyIcon} alt="trophy" className="w-12 h-12 inline-block ml-2" />
             </span>
           </h1>
-          {/* Tổng quan doanh thu */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-14 px-2 md:px-0">
             <div className="bg-gradient-to-br from-orange-400 to-yellow-300 text-white p-10 rounded-3xl shadow-2xl flex flex-col items-start min-h-[160px] relative overflow-hidden">
               <img src={tableIcon} alt="today" className="absolute right-4 bottom-4 w-20 h-20 opacity-20 pointer-events-none select-none" />
@@ -267,7 +260,6 @@ const DoanhThu: React.FC = () => {
               <span className="text-base opacity-90">{getMonth()}</span>
             </div>
           </div>
-          {/* Bộ lọc thông minh */}
           <div className="flex flex-wrap justify-between items-center mb-10 gap-4 px-2 md:px-0 animate-fade-in">
             <div className="flex items-center gap-4">
               <button
@@ -313,7 +305,6 @@ const DoanhThu: React.FC = () => {
               )}
             </div>
           </div>
-          {/* Top món bán chạy */}
           <div className="mb-14 animate-fade-in">
             <h2 className="text-2xl font-bold text-orange-700 mb-6 flex items-center gap-3">
               <span>🔥</span> Top món bán chạy
@@ -349,7 +340,6 @@ const DoanhThu: React.FC = () => {
           </div>
           <div className="bg-white rounded-3xl shadow-2xl p-16 border border-orange-100 flex-1 overflow-y-auto custom-scrollbar transition-all duration-300">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-16">
-              {/* Biểu đồ bar chart */}
               <div className="bg-gradient-to-br from-orange-50 to-yellow-50 p-12 rounded-3xl shadow-2xl flex flex-col items-center border border-orange-100 min-h-[420px] mb-16 animate-fade-in relative overflow-hidden">
                 <img src={chartBgImg} alt="chart" className="absolute right-6 bottom-6 w-32 h-32 opacity-10 pointer-events-none select-none" />
                 <h3 className="text-2xl font-bold text-orange-700 mb-6 flex items-center gap-2">📊 Biểu đồ doanh thu</h3>

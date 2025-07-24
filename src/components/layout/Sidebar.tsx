@@ -31,7 +31,8 @@ const Sidebar = () => {
     { path: "/account", label: "Tài khoản", icon: "👤" }
   ];
 
-  const settingsLink = { path: "/caidat", label: "Cài đặt", icon: "⚙️" };
+  // sau này triển khai trang cài đặt
+  const settingsLink = { path: "/logout", label: "Cài đặt", icon: "⚙️" };
 
   return (
     <div className="w-52 bg-orange-50 border-r border-orange-200 flex flex-col h-screen min-h-screen overflow-hidden">
