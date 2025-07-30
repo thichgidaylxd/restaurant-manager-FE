@@ -129,7 +129,7 @@ const TableGrid = () => {
       }
     };
     fetchRevenueToday();
-  }, []);
+  }, [tables]);
 
   const recordPaymentRequestTime = async () => {
     await updateTableStatus(selTable, "Chờ thanh toán");

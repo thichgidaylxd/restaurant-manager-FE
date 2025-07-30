@@ -38,14 +38,14 @@ const HoaDon = () => {
         if (selectedDate) {
           const dateStr = format(selectedDate, "yyyy-MM-dd");
           res = await InvoiceService.getAllInvoicesByDate(dateStr);
+          setInvoices(res.data || []);
         } else {
           res = await InvoiceService.getAllInvoices();
           res = (res.data || []).sort(
             (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
           );
+          setInvoices(res);
         }
-        setInvoices(res);
-
       } catch (err: any) {
         setError(err.message || "Lỗi khi lấy danh sách hóa đơn");
       } finally {

@@ -45,7 +45,7 @@ const AppRoutes = () => {
       <Route
         path="/invoices"
         element={
-          <ProtectedRoute allowedRoles={["Người quản lý", "Nhân viên", "Nhân viên thu ngân"]}>
+          <ProtectedRoute allowedRoles={["Người quản lý", "Nhân viên", "Nhân viên thu ngân", "Nhân viên bếp"]}>
             <HoaDon />
           </ProtectedRoute>
         }
