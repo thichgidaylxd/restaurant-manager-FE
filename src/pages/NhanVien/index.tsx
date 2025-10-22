@@ -139,7 +139,7 @@ const NhanVien = () => {
         address: values.address,
         phoneNumber: values.phoneNumber,
         birthDate: values.birthDate,
-        image: imageBase64,
+        imageBase64: imageBase64,
       });
       setShowAdd(false);
       form.reset();
@@ -203,7 +203,7 @@ const NhanVien = () => {
       }
       await UserService.updateEmployee({
         ...values,
-        image: imageBase64,
+        imageBase64: imageBase64,
       });
       setShowEdit(false);
       setEditingEmployee(null);

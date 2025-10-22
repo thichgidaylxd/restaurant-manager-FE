@@ -1,5 +1,8 @@
 import axios from "axios";
 
+
+// https://restaurant-manager-be-f7mh.onrender.com/restaurant/api
+// https://restaurant-manager-be-f7mh.onrender.com/restaurant/api
 // Axios configuration
 const axiosInstance = axios.create({
   baseURL: "https://restaurant-manager-be-f7mh.onrender.com/restaurant/api",

@@ -2,6 +2,7 @@ import axiosInstance from "@/config/axios";
 
 export class MenuService {
   static async getAllMenuItems() {
+
     try {
       const response = await axiosInstance.get("/dishes");
       console.log("Response from GET /dishes:", response.data);
@@ -48,7 +49,7 @@ export class MenuService {
     price: number;
     unit: string;
     note?: string | null;
-    image?: string | null;
+    imageBase64?: string | null;
   }) {
     try {
       const response = await axiosInstance.post("/dishes", dishData);

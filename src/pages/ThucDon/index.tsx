@@ -173,7 +173,7 @@ const ThucDon = () => {
       }
 
       const imageBase64 = await convertImageToBase64(newDish.image);
-
+      console.log("Converted image to base64:", imageBase64);
       const dishData = {
         dishType: {
           id: newDish.dishTypeId,
@@ -183,7 +183,7 @@ const ThucDon = () => {
         price: parseFloat(newDish.price),
         unit: newDish.unit.trim(),
         note: newDish.note.trim() || null,
-        image: imageBase64
+        imageBase64: imageBase64
       };
 
       await MenuService.createDish(dishData);

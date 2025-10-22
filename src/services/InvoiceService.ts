@@ -1,5 +1,5 @@
 import axiosInstance from "@/config/axios";
-const BASE_URL = "https://restaurant-manager-be-f7mh.onrender.com/restaurant/api";
+const BASE_URL = https://restaurant-manager-be-f7mh.onrender.com/restaurant/api";
 export class InvoiceService {
 
   static async getAllInvoices() {
