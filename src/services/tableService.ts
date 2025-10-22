@@ -3,7 +3,7 @@ import { OrderItem, RestaurantTable, TableType } from "@/types/table";
 import { Dish } from "@/types/dish";
 import axiosInstance from "@/config/axios";
 
-const BASE_URL = "http://localhost:8081/restaurant/api";
+const BASE_URL = "https://restaurant-manager-be-f7mh.onrender.com/restaurant/api";
 
 interface TableData {
   tables: RestaurantTable[];

@@ -22,7 +22,7 @@ const Register: React.FC = () => {
       return;
     }
     setLoading(true);
-    const roleId = "";
+    const roleId = "7bb30425-465b-430b-b32f-8bc630461d8b";
     const res = await AuthService.register({ accountName, account, roleId, password, confirmPassword }); // Giả sử backend nhận phone là email
     setLoading(false);
     if (res.success) {
