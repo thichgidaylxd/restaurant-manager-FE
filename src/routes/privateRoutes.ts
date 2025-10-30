@@ -42,6 +42,10 @@ export const privateRoutes = [
   },
   {
     path: "/review",
-    name: "ReivewPage",
+    name: "ReviewPage",
+  },
+  {
+    path: "/review-view",
+    name: "ViewReviewPage",
   },
 ];

@@ -126,36 +126,83 @@ const NhanVien = () => {
 
   const onSubmit = async (values: any) => {
     try {
+      // Validate required fields
+      if (!values.employeeName?.trim()) {
+        alert("Vui lòng nhập họ tên nhân viên");
+        return;
+      }
+
+      if (!values.positionId) {
+        alert("Vui lòng chọn chức vụ");
+        return;
+      }
+
+      if (!values.phoneNumber?.trim()) {
+        alert("Vui lòng nhập số điện thoại");
+        return;
+      }
+
+      if (!values.birthDate) {
+        alert("Vui lòng chọn ngày sinh");
+        return;
+      }
+
+      if (!values.address?.trim()) {
+        alert("Vui lòng nhập địa chỉ");
+        return;
+      }
+
+      // Process image if provided
       let imageBase64 = "";
       if (values.image && values.image.length > 0) {
         const file = values.image[0];
+
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+          alert("Vui lòng chọn file ảnh hợp lệ");
+          return;
+        }
+
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          alert("Kích thước ảnh không được vượt quá 5MB");
+          return;
+        }
+
         imageBase64 = await toBase64(file);
         imageBase64 = imageBase64.split(",")[1];
       }
-      console.log("values trước khi gửi", values);
+
+      // Create employee
       await UserService.createEmployee({
-        employeeName: values.employeeName,
+        employeeName: values.employeeName.trim(),
         positionId: values.positionId,
-        address: values.address,
-        phoneNumber: values.phoneNumber,
+        address: values.address.trim(),
+        phoneNumber: values.phoneNumber.trim(),
         birthDate: values.birthDate,
         imageBase64: imageBase64,
       });
+
+      // Reset form and close modal
       setShowAdd(false);
       form.reset();
 
-
-
+      // Refresh employee list
       const res = await UserService.getAllEmployees();
       const formatted = (res.data || []).map((emp) => ({
         ...emp,
         image: emp.image
           ? `data:image/jpeg;base64,${emp.image}`
-          : "default-avatar-url.jpg", // nếu ảnh null
+          : "default-avatar-url.jpg",
       }));
       setEmployees(formatted);
+
+      // Show success message
+      alert("Thêm nhân viên thành công!");
+
     } catch (err: any) {
-      alert(err.message || "Lỗi khi thêm nhân viên");
+      console.error("Lỗi khi thêm nhân viên:", err);
+      alert(err.response?.data?.message || err.message || "Lỗi khi thêm nhân viên");
     }
   };
 

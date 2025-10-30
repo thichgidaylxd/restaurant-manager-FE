@@ -327,6 +327,11 @@ const TableGrid = () => {
 
   const addTable = async () => {
     try {
+      // Validate table name
+      if (!newTable.name.trim()) {
+        setAddTableError("Vui lòng nhập tên bàn");
+        return;
+      }
 
       const tableName = newTable.name;
       const existingTable = tables.find((t) => t.name === tableName);
@@ -334,15 +339,42 @@ const TableGrid = () => {
         setAddTableError(`Bàn ${tableName} đã tồn tại. Vui lòng chọn tên khác.`);
         return;
       }
+
+      // Validate table type
       const tableTypeId = newTable.tableTypeId || selectedTableType;
       if (!tableTypeId) {
-        setAddTableError("Vui lòng chọn loại bàn.");
+        setAddTableError("Vui lòng chọn loại bàn");
         return;
       }
-      if (!newTable.maxPerson || isNaN(parseInt(newTable.maxPerson)) || parseInt(newTable.maxPerson) <= 0) {
-        setAddTableError("Số lượng người tối đa phải là số dương.");
+      if (!newTable.name.trim()) {
+        setAddTableError("Vui lòng nhập tên bàn");
         return;
       }
+      if (!tableTypeId) {
+        setAddTableError("Vui lòng chọn loại bàn");
+        return;
+      }
+      if (!newTable.maxPerson) {
+        setAddTableError("Vui lòng nhập số lượng người tối đa");
+        return;
+      }
+
+      if (isNaN(parseInt(newTable.maxPerson)) || parseInt(newTable.maxPerson) <= 0) {
+        setAddTableError("Số lượng người tối đa phải là số dương");
+        return;
+      }
+      // Validate max person number
+      if (!newTable.maxPerson) {
+        setAddTableError("Vui lòng nhập số lượng người tối đa");
+        return;
+      }
+
+      if (isNaN(parseInt(newTable.maxPerson)) || parseInt(newTable.maxPerson) <= 0) {
+        setAddTableError("Số lượng người tối đa phải là số dương");
+        return;
+      }
+
+      // Create payload after all validations pass
       const payload = {
         name: tableName,
         tableType: {
@@ -352,9 +384,12 @@ const TableGrid = () => {
         maxPerson: parseInt(newTable.maxPerson),
         note: newTable.note || null,
       };
+
       console.log("Sending POST /tables with payload:", payload);
       await addNewTable(payload);
       console.log("Table added successfully:", payload);
+
+      // Reset form and show success message
       await fetchTables();
       setTableError(null);
       setNotifMessage("Thêm bàn thành công!");
@@ -364,6 +399,7 @@ const TableGrid = () => {
       setSelectedTableType(null);
       setAddTableError(null);
       setTimeout(() => setShowDelNotif(false), 3000);
+
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || err.message || "Không thể thêm bàn mới. Vui lòng thử lại.";
       console.error("Lỗi khi thêm bàn mới:", {

@@ -11,7 +11,7 @@ interface Props {
 const ProtectedRoute = ({ allowedRoles, children }: Props) => {
     const role = getUserRole();
     if (!allowedRoles.includes(role)) {
-        return <Navigate to="/notfoundpage" replace />;
+        return <Navigate to="/login" replace />;
     }
 
     return <>{children} </>;

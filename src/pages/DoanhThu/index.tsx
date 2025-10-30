@@ -132,18 +132,18 @@ const DoanhThu: React.FC = () => {
         let response: any;
         if (filterType === 'day') {
           response = await RevenueService.getRevenueByDay(selectedDate || getToday());
-          if (response.code === 200) {
-            setRevenueList([response.data]);
+          if (response.code === 200 && response.data) {
+            setRevenueList([response.data].filter(Boolean)); // Filter out null/undefined
           }
         } else if (filterType === 'week') {
           response = await RevenueService.getRevenueByWeek(selectedDate || getToday());
           if (response.code === 200 && Array.isArray(response.data)) {
-            setRevenueList(response.data);
+            setRevenueList(response.data.filter(Boolean)); // Filter out null/undefined
           }
         } else if (filterType === 'month') {
           response = await RevenueService.getRevenueByMonth(getMonth());
           if (response.code === 200 && Array.isArray(response.data)) {
-            setRevenueList(response.data);
+            setRevenueList(response.data.filter(Boolean)); // Filter out null/undefined
           }
         } else {
           setError("Dữ liệu doanh thu không hợp lệ");
@@ -151,6 +151,7 @@ const DoanhThu: React.FC = () => {
         }
       } catch (err: any) {
         setError(err.message || "Không thể tải dữ liệu doanh thu");
+        setRevenueList([]); // Set empty array on error
       } finally {
         setLoading(false);
       }
@@ -193,12 +194,19 @@ const DoanhThu: React.FC = () => {
     fetchTopDishes();
   }, []);
 
+  // Fix the chart data preparation
   const chartData = {
-    labels: revenueList.sort((a, b) => a.date.localeCompare(b.date)).map(r => r.date),
+    labels: revenueList
+      .filter(r => r && r.date) // Filter out null/undefined items
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .map(r => r.date),
     datasets: [
       {
         label: "Tổng tiền (VND)",
-        data: revenueList.sort((a, b) => a.date.localeCompare(b.date)).map(r => r.totalAmount),
+        data: revenueList
+          .filter(r => r && r.date) // Filter out null/undefined items
+          .sort((a, b) => a.date.localeCompare(b.date))
+          .map(r => r.totalAmount),
         backgroundColor: "rgba(251,146,60,0.7)",
         borderRadius: 12,
         borderSkipped: false,
@@ -254,51 +262,7 @@ const DoanhThu: React.FC = () => {
               <span className="text-base opacity-90">{getMonth()}</span>
             </div>
           </div>
-          <div className="flex flex-wrap justify-between items-center mb-10 gap-4 px-2 md:px-0 animate-fade-in">
-            <div className="flex items-center gap-4">
-              <button
-                className={`px-5 py-2 rounded-xl font-bold text-lg border-2 transition ${filterType === 'day' ? 'bg-orange-500 text-white border-orange-500' : 'bg-white text-orange-500 border-orange-200 hover:bg-orange-50'}`}
-                onClick={() => { setFilterType('day'); setSelectedDate(getToday()); }}
-              >
-                Ngày
-              </button>
-              <button
-                className={`px-5 py-2 rounded-xl font-bold text-lg border-2 transition ${filterType === 'week' ? 'bg-orange-500 text-white border-orange-500' : 'bg-white text-orange-500 border-orange-200 hover:bg-orange-50'}`}
-                onClick={() => { setFilterType('week'); setSelectedDate(getToday()); }}
-              >
-                Tuần
-              </button>
-              <button
-                className={`px-5 py-2 rounded-xl font-bold text-lg border-2 transition ${filterType === 'month' ? 'bg-orange-500 text-white border-orange-500' : 'bg-white text-orange-500 border-orange-200 hover:bg-orange-50'}`}
-                onClick={() => { setFilterType('month'); setSelectedDate(''); }}
-              >
-                Tháng
-              </button>
-            </div>
-            <div className="flex items-center gap-2">
-              <label className="font-semibold text-orange-700 text-lg flex items-center gap-2">
-                <Calendar className="w-5 h-5" />Chọn ngày:
-              </label>
-              <input
-                type="date"
-                value={selectedDate}
-                onChange={(e) => {
-                  setSelectedDate(e.target.value);
-                  setFilterType('day');
-                }}
-                className="border border-orange-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-200 text-lg"
-                max={getToday()}
-              />
-              {selectedDate && (
-                <button
-                  className="ml-2 px-3 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 font-semibold"
-                  onClick={() => setSelectedDate(getToday())}
-                >
-                  Xóa lọc
-                </button>
-              )}
-            </div>
-          </div>
+
           <div className="mb-14 animate-fade-in">
             <h2 className="text-2xl font-bold text-orange-700 mb-6 flex items-center gap-3">
               <span>🔥</span> Top món bán chạy
@@ -380,36 +344,7 @@ const DoanhThu: React.FC = () => {
                 </div>
               </div>
             </div>
-            <h2 className="text-3xl font-extrabold text-orange-700 mb-8 flex items-center gap-4 mt-16">
-              <span>📅</span> Bảng doanh thu từng ngày
-            </h2>
-            {loading ? (
-              <div className="text-center text-orange-500 py-12 text-xl font-semibold animate-pulse">Đang tải dữ liệu...</div>
-            ) : error ? (
-              <div className="text-center text-red-500 py-12 text-xl font-semibold">{error}</div>
-            ) : (
-              <div className="overflow-x-auto mb-12 rounded-3xl border border-orange-100 shadow-2xl bg-gradient-to-br from-orange-50 to-yellow-50 relative">
-                <img src={tableBgImg} alt="table" className="absolute left-8 top-8 w-20 h-20 opacity-10 pointer-events-none select-none" />
-                <table className="min-w-full border rounded-3xl shadow-xl overflow-hidden text-xl">
-                  <thead className="sticky top-0 z-10">
-                    <tr className="bg-gradient-to-r from-orange-200 to-yellow-100">
-                      <th className="px-10 py-6 text-left text-orange-700 font-extrabold text-2xl">Ngày</th>
-                      <th className="px-10 py-6 text-right text-orange-700 font-extrabold text-2xl">Tổng tiền (VND)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {revenueList.length === 0 ? (
-                      <tr><td colSpan={2} className="text-center py-16 text-gray-400 text-2xl">Không có dữ liệu</td></tr>
-                    ) : revenueList.sort((a, b) => b.date.localeCompare(a.date)).map((r, idx) => (
-                      <tr key={r.id} className={`border-b ${idx % 2 === 0 ? 'bg-white' : 'bg-orange-50'} hover:bg-yellow-50 transition`}>
-                        <td className="px-10 py-6 font-bold text-gray-800 tracking-wide whitespace-nowrap text-xl">{r.date}</td>
-                        <td className="px-10 py-6 text-right font-extrabold text-orange-600 text-2xl whitespace-nowrap">{r.totalAmount.toLocaleString()}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+
           </div>
         </div>
         <style>{`

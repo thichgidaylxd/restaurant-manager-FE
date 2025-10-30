@@ -16,6 +16,7 @@ import CustomerPage from "@/pages/KhachHang/khachhang";
 import TableBooking from "@/pages/DatBan";
 import OrderedTableList from "@/pages/YeuCauDatBan/OrderedTableList";
 import ReviewPage from "@/pages/DanhGia/ReviewPage";
+import ViewReviewPage from "@/pages/XemDanhGia/ViewReviewPage";
 
 const AppRoutes = () => {
   return (
@@ -122,8 +123,16 @@ const AppRoutes = () => {
           </ProtectedRoute >
         }
       />
+      < Route
+        path="/review-view"
+        element={
+          <ProtectedRoute allowedRoles={["Người quản lý"]} >
+            <ViewReviewPage />
+          </ProtectedRoute >
+        }
+      />
       {/* Fallback route */}
-      <Route path="*" element={<NotFoundPage />} />
+      <Route path="*" element={<Login />} />
     </Routes >
   );
 };

@@ -1,28 +1,50 @@
-import React, { useEffect } from "react";
-import { FaUtensils } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { FaStar, FaUtensils } from "react-icons/fa";
+import { Link, useNavigate } from "react-router-dom";
 
 const Home: React.FC = () => {
+  const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
   useEffect(() => {
+    // Check if user is logged in by looking for token
+    const token = localStorage.getItem('token');
+    setIsLoggedIn(!!token);
+  }, []);
 
-  })
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setIsLoggedIn(false);
+    navigate('/');
+  };
+
   return (
     <div className="w-full h-screen bg-orange-50 text-foreground relative">
-      {/* Login/Register Buttons */}
+      {/* Auth Buttons */}
       <div className="absolute top-4 right-4 flex gap-4 z-40">
-        <Link
-          to="/login"
-          className="bg-orange-500 text-white font-semibold px-4 py-2 rounded-full hover:bg-orange-600 transition"
-        >
-          Đăng nhập
-        </Link>
-        <Link
-          to="/register"
-          className="bg-white text-orange-500 font-semibold px-4 py-2 rounded-full border border-orange-500 hover:bg-orange-500 hover:text-white transition"
-        >
-          Đăng ký
-        </Link>
+        {!isLoggedIn ? (
+          <>
+            <Link
+              to="/login"
+              className="bg-orange-500 text-white font-semibold px-4 py-2 rounded-full hover:bg-orange-600 transition"
+            >
+              Đăng nhập
+            </Link>
+            <Link
+              to="/register"
+              className="bg-white text-orange-500 font-semibold px-4 py-2 rounded-full border border-orange-500 hover:bg-orange-500 hover:text-white transition"
+            >
+              Đăng ký
+            </Link>
+          </>
+        ) : (
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 text-white font-semibold px-4 py-2 rounded-full hover:bg-red-600 transition"
+          >
+            Đăng xuất
+          </button>
+        )}
       </div>
 
       <div className="flex-1 flex flex-col items-stretch overflow-auto">
@@ -48,7 +70,14 @@ const Home: React.FC = () => {
             >
               <FaUtensils className="text-xl" /> Đặt bàn ngay
             </a>
+            <a
+              href="/review"
+              className="inline-flex items-center gap-2 bg-white/90 text-orange-600 font-bold px-8 py-3 rounded-full text-lg shadow-lg hover:bg-orange-500 hover:text-white transition mb-2 animate-fade-in delay-300"
+            >
+              <FaStar className="text-xl" /> Đánh giá
+            </a>
           </div>
+
         </div>
         {/* Phần giới thiệu */}
         <div className="flex flex-col md:flex-row items-center justify-center gap-8 py-12 px-6 bg-white">
