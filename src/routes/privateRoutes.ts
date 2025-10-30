@@ -32,4 +32,16 @@ export const privateRoutes = [
     path: "/taikhoan",
     name: "Account",
   },
+  {
+    path: "/booking/table",
+    name: "TableBooking",
+  },
+  {
+    path: "/ordered-tables",
+    name: "OrderedTableList",
+  },
+  {
+    path: "/review",
+    name: "ReivewPage",
+  },
 ];

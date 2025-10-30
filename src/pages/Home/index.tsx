@@ -5,10 +5,7 @@ import { Link } from "react-router-dom";
 const Home: React.FC = () => {
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token != null)
-      localStorage.removeItem("token");
-    localStorage.removeItem("user")
+
   })
   return (
     <div className="w-full h-screen bg-orange-50 text-foreground relative">
@@ -46,7 +43,7 @@ const Home: React.FC = () => {
               Trải nghiệm ẩm thực tuyệt vời, không gian sang trọng, phục vụ tận tâm
             </div>
             <a
-              href="#datban"
+              href="booking/table"
               className="inline-flex items-center gap-2 bg-white/90 text-orange-600 font-bold px-8 py-3 rounded-full text-lg shadow-lg hover:bg-orange-500 hover:text-white transition mb-2 animate-fade-in delay-200"
             >
               <FaUtensils className="text-xl" /> Đặt bàn ngay

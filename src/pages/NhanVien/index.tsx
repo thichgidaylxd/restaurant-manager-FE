@@ -184,7 +184,7 @@ const NhanVien = () => {
     setEditingEmployee(emp);
     editForm.reset({
       id: emp.id,
-      employeeName: emp.name,
+      employeeName: emp.employeeName,
       positionId: emp.positionId,
       image: undefined,
       address: emp.address,
@@ -194,13 +194,28 @@ const NhanVien = () => {
     setShowEdit(true);
   };
 
+  const convertImageToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const result = reader.result as string;
+        const base64 = result.split(',')[1]; // Remove data:image/jpeg;base64, prefix
+        resolve(base64);
+      };
+      reader.onerror = error => reject(error);
+    });
+  };
+
   const onEditSubmit = async (values: any) => {
     try {
       let imageBase64 = editingEmployee?.image || "";
       if (values.image && values.image.length > 0) {
         const file = values.image[0];
-        imageBase64 = await toBase64(file);
+        //  imageBase64 = await toBase64(file);
+        imageBase64 = await convertImageToBase64(file);
       }
+      console.log("values trước khi gửi", values);
       await UserService.updateEmployee({
         ...values,
         imageBase64: imageBase64,
@@ -266,7 +281,7 @@ const NhanVien = () => {
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <User className="w-5 h-5 text-orange-400" />
-                    <span className="font-bold text-lg text-orange-600">{emp.name}</span>
+                    <span className="font-bold text-lg text-orange-600">{emp.employeeName}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-orange-400">
                     <span className="font-semibold flex items-center gap-1"><Briefcase className="w-4 h-4" />Chức vụ:</span>

@@ -1,62 +1,411 @@
-import React from "react";
-import { Menu } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import React, { useState, useEffect } from 'react';
+import { Calendar, Users, Phone, User, Clock, AlertCircle } from 'lucide-react';
 
-const mockBookings = Array.from({ length: 8 }).map((_, i) => ({
-  phone: "Số điện thoại",
-  table: "Số bàn",
-  date: "Ngày",
-  time: "Giờ",
-  note: "Ghi chú",
-}));
+const TableBooking = () => {
+  const [tables, setTables] = useState([]);
+  const [formData, setFormData] = useState({
+    phone: '',
+    name: '',
+    orderedTime: '',
+    personNumber: '',
+    tableId: ''
+  });
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
 
-const DatBan = () => {
+  // Fetch danh sách bàn khi component mount
+  useEffect(() => {
+    fetchTables();
+  }, []);
+
+  const fetchTables = async () => {
+    try {
+      const response = await fetch('https://restaurant-manager-be-f7mh.onrender.com/restaurant/api/tables');
+      const result = await response.json();
+      console.log('API Response:', result);
+
+      if (result.data && Array.isArray(result.data)) {
+        // Lọc chỉ lấy bàn còn trống và đảm bảo dữ liệu hợp lệ
+        const availableTables = result.data
+          .filter(table => table && table.status === 'Trống')
+          .map(table => ({
+            id: table.id || '',
+            name: table.name || 'Bàn không tên',
+            tableType: table.tableType?.name || table.tableType || 'Bàn thường',
+            maxPerson: table.maxPerson || 0,
+            status: table.status || ''
+          }));
+        console.log('Available Tables:', availableTables);
+        setTables(availableTables);
+      }
+    } catch (error) {
+      console.error('Lỗi khi tải danh sách bàn:', error);
+      setTables([]);
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = 'Vui lòng nhập Họ và tên';
+    }
+
+    if (!formData.phone.trim()) {
+      newErrors.phone = 'Vui lòng nhập Số điện thoại';
+    } else if (!/^[0-9]{10}$/.test(formData.phone)) {
+      newErrors.phone = 'Số điện thoại phải có 10 chữ số';
+    }
+
+    if (!formData.orderedTime) {
+      newErrors.orderedTime = 'Vui lòng chọn Thời gian đặt bàn';
+    } else {
+      const selectedTime = new Date(formData.orderedTime);
+      const now = new Date();
+      if (selectedTime < now) {
+        newErrors.orderedTime = 'Thời gian đặt bàn phải sau thời điểm hiện tại';
+      }
+    }
+
+    if (!formData.personNumber) {
+      newErrors.personNumber = 'Vui lòng nhập Số người';
+    } else if (formData.personNumber < 1) {
+      newErrors.personNumber = 'Số người phải lớn hơn 0';
+    }
+
+    if (!formData.tableId) {
+      newErrors.tableId = 'Vui lòng chọn Bàn';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    // Xóa lỗi khi người dùng bắt đầu nhập
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch('https://restaurant-manager-be-f7mh.onrender.com/restaurant/api/ordered-table', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          personNumber: parseInt(formData.personNumber),
+          orderedTime: new Date(formData.orderedTime).toISOString()
+        })
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setSubmitSuccess(true);
+        // Reset form
+        setFormData({
+          phone: '',
+          name: '',
+          orderedTime: '',
+          personNumber: '',
+          tableId: ''
+        });
+        // Tải lại danh sách bàn
+        fetchTables();
+
+        // Ẩn thông báo thành công sau 3 giây
+        setTimeout(() => setSubmitSuccess(false), 3000);
+      } else {
+        alert('Có lỗi xảy ra: ' + (result.message || 'Vui lòng thử lại'));
+      }
+    } catch (error) {
+      console.error('Lỗi:', error);
+      alert('Không thể kết nối đến server');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getMinDateTime = () => {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    return now.toISOString().slice(0, 16);
+  };
+
   return (
-    <div className="max-w-4xl mx-auto rounded-2xl shadow-2xl bg-white/90 p-0 overflow-hidden relative border border-orange-100">
-      {/* Header */}
-      <div className="flex items-center gap-3 px-8 pt-8 pb-4">
-        <Menu className="w-8 h-8 text-orange-500" />
-        <span className="text-3xl font-bold text-orange-600 select-none">Ghi nhận đặt bàn</span>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #fff5e6 0%, #ffe0b3 100%)', padding: '40px 20px' }}>
+      <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+        {/* Header */}
+        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+          <h1 style={{ fontSize: '36px', fontWeight: 'bold', color: '#ff6b00', marginBottom: '10px' }}>
+            Đặt Bàn Nhà Hàng
+          </h1>
+          <p style={{ color: '#ff8c00', fontSize: '16px' }}>
+            Vui lòng điền đầy đủ thông tin để đặt bàn
+          </p>
+        </div>
+
+        {/* Success Message */}
+        {submitSuccess && (
+          <div style={{
+            background: '#fff',
+            border: '2px solid #4ade80',
+            borderRadius: '12px',
+            padding: '16px',
+            marginBottom: '24px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+          }}>
+            <div style={{ color: '#4ade80', fontSize: '24px' }}>✓</div>
+            <div style={{ color: '#16a34a', fontWeight: '600' }}>
+              Đặt bàn thành công! Chúng tôi sẽ liên hệ với bạn sớm.
+            </div>
+          </div>
+        )}
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} style={{
+          background: '#fff',
+          borderRadius: '20px',
+          padding: '40px',
+          boxShadow: '0 10px 30px rgba(255, 107, 0, 0.2)'
+        }}>
+          {/* Họ và tên */}
+          <div style={{ marginBottom: '24px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#ff6b00' }}>
+              <User size={18} style={{ display: 'inline', marginRight: '8px', verticalAlign: 'middle' }} />
+              Họ và tên
+            </label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="Nhập họ và tên của bạn"
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                border: errors.name ? '2px solid #ef4444' : '2px solid #ffb366',
+                borderRadius: '10px',
+                fontSize: '16px',
+                outline: 'none',
+                transition: 'all 0.3s',
+                boxSizing: 'border-box'
+              }}
+              onFocus={(e) => e.target.style.borderColor = '#ff6b00'}
+              onBlur={(e) => e.target.style.borderColor = errors.name ? '#ef4444' : '#ffb366'}
+            />
+            {errors.name && (
+              <div style={{ color: '#ef4444', fontSize: '14px', marginTop: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <AlertCircle size={16} />
+                {errors.name}
+              </div>
+            )}
+          </div>
+
+          {/* Số điện thoại */}
+          <div style={{ marginBottom: '24px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#ff6b00' }}>
+              <Phone size={18} style={{ display: 'inline', marginRight: '8px', verticalAlign: 'middle' }} />
+              Số điện thoại
+            </label>
+            <input
+              type="tel"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              placeholder="Nhập số điện thoại"
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                border: errors.phone ? '2px solid #ef4444' : '2px solid #ffb366',
+                borderRadius: '10px',
+                fontSize: '16px',
+                outline: 'none',
+                transition: 'all 0.3s',
+                boxSizing: 'border-box'
+              }}
+              onFocus={(e) => e.target.style.borderColor = '#ff6b00'}
+              onBlur={(e) => e.target.style.borderColor = errors.phone ? '#ef4444' : '#ffb366'}
+            />
+            {errors.phone && (
+              <div style={{ color: '#ef4444', fontSize: '14px', marginTop: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <AlertCircle size={16} />
+                {errors.phone}
+              </div>
+            )}
+          </div>
+
+          {/* Thời gian đặt bàn */}
+          <div style={{ marginBottom: '24px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#ff6b00' }}>
+              <Clock size={18} style={{ display: 'inline', marginRight: '8px', verticalAlign: 'middle' }} />
+              Thời gian đặt bàn
+            </label>
+            <input
+              type="datetime-local"
+              name="orderedTime"
+              value={formData.orderedTime}
+              onChange={handleChange}
+              min={getMinDateTime()}
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                border: errors.orderedTime ? '2px solid #ef4444' : '2px solid #ffb366',
+                borderRadius: '10px',
+                fontSize: '16px',
+                outline: 'none',
+                transition: 'all 0.3s',
+                boxSizing: 'border-box'
+              }}
+              onFocus={(e) => e.target.style.borderColor = '#ff6b00'}
+              onBlur={(e) => e.target.style.borderColor = errors.orderedTime ? '#ef4444' : '#ffb366'}
+            />
+            {errors.orderedTime && (
+              <div style={{ color: '#ef4444', fontSize: '14px', marginTop: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <AlertCircle size={16} />
+                {errors.orderedTime}
+              </div>
+            )}
+          </div>
+
+          {/* Số người */}
+          <div style={{ marginBottom: '24px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#ff6b00' }}>
+              <Users size={18} style={{ display: 'inline', marginRight: '8px', verticalAlign: 'middle' }} />
+              Số người
+            </label>
+            <input
+              type="number"
+              name="personNumber"
+              value={formData.personNumber}
+              onChange={handleChange}
+              placeholder="Nhập số người"
+              min="1"
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                border: errors.personNumber ? '2px solid #ef4444' : '2px solid #ffb366',
+                borderRadius: '10px',
+                fontSize: '16px',
+                outline: 'none',
+                transition: 'all 0.3s',
+                boxSizing: 'border-box'
+              }}
+              onFocus={(e) => e.target.style.borderColor = '#ff6b00'}
+              onBlur={(e) => e.target.style.borderColor = errors.personNumber ? '#ef4444' : '#ffb366'}
+            />
+            {errors.personNumber && (
+              <div style={{ color: '#ef4444', fontSize: '14px', marginTop: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <AlertCircle size={16} />
+                {errors.personNumber}
+              </div>
+            )}
+          </div>
+
+          {/* Chọn bàn */}
+          <div style={{ marginBottom: '32px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#ff6b00' }}>
+              <Calendar size={18} style={{ display: 'inline', marginRight: '8px', verticalAlign: 'middle' }} />
+              Chọn bàn
+            </label>
+            <select
+              name="tableId"
+              value={formData.tableId}
+              onChange={handleChange}
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                border: errors.tableId ? '2px solid #ef4444' : '2px solid #ffb366',
+                borderRadius: '10px',
+                fontSize: '16px',
+                outline: 'none',
+                transition: 'all 0.3s',
+                boxSizing: 'border-box',
+                backgroundColor: '#fff',
+                cursor: 'pointer'
+              }}
+              onFocus={(e) => e.target.style.borderColor = '#ff6b00'}
+              onBlur={(e) => e.target.style.borderColor = errors.tableId ? '#ef4444' : '#ffb366'}
+            >
+              <option value="">-- Chọn bàn --</option>
+              {tables.length > 0 ? (
+                tables.map(table => (
+                  <option key={table.id} value={table.id}>
+                    {table.name} - {table.tableType} (Tối đa {table.maxPerson} người)
+                  </option>
+                ))
+              ) : (
+                <option disabled>Không có bàn trống</option>
+              )}
+            </select>
+            {errors.tableId && (
+              <div style={{ color: '#ef4444', fontSize: '14px', marginTop: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <AlertCircle size={16} />
+                {errors.tableId}
+              </div>
+            )}
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              width: '100%',
+              padding: '16px',
+              backgroundColor: loading ? '#ffb366' : '#ff6b00',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '10px',
+              fontSize: '18px',
+              fontWeight: 'bold',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              transition: 'all 0.3s',
+              boxShadow: '0 4px 6px rgba(255, 107, 0, 0.3)'
+            }}
+            onMouseOver={(e) => {
+              if (!loading) e.target.style.backgroundColor = '#ff8c00';
+            }}
+            onMouseOut={(e) => {
+              if (!loading) e.target.style.backgroundColor = '#ff6b00';
+            }}
+          >
+            {loading ? 'Đang xử lý...' : 'Đặt Bàn Ngay'}
+          </button>
+        </form>
+
+        {/* Footer */}
+        <div style={{ textAlign: 'center', marginTop: '24px', color: '#ff8c00' }}>
+          <p style={{ fontSize: '14px' }}>
+            Cần hỗ trợ? Liên hệ: <strong>0123 456 789</strong>
+          </p>
+        </div>
       </div>
-      {/* Bảng đặt bàn */}
-      <div className="px-8 pb-4 max-h-[420px] overflow-y-auto scrollbar-thin scrollbar-thumb-orange-400 scrollbar-track-transparent">
-        <table className="w-full border-separate border-spacing-0">
-          <thead>
-            <tr className="bg-blue-500 text-white rounded-t-lg">
-              <th className="py-3 px-2 font-semibold text-white">Số điện thoại</th>
-              <th className="py-3 px-2 font-semibold text-white">Số bàn</th>
-              <th className="py-3 px-2 font-semibold text-white">Ngày</th>
-              <th className="py-3 px-2 font-semibold text-white">Giờ</th>
-              <th className="py-3 px-2 font-semibold text-white">Ghi chú</th>
-            </tr>
-          </thead>
-          <tbody>
-            {mockBookings.map((row, idx) => (
-              <tr key={idx} className="bg-white border-b border-gray-300 last:rounded-b-lg">
-                <td className="py-3 px-2 text-center border border-gray-200">{row.phone}</td>
-                <td className="py-3 px-2 text-center border border-gray-200">{row.table}</td>
-                <td className="py-3 px-2 text-center border border-gray-200">{row.date}</td>
-                <td className="py-3 px-2 text-center border border-gray-200">{row.time}</td>
-                <td className="py-3 px-2 text-center border border-gray-200 flex flex-col md:flex-row items-center gap-2 justify-center">
-                  <span>{row.note}</span>
-                  <Button className="bg-pink-100 text-pink-700 hover:bg-pink-200 rounded-md px-3 py-1 text-sm font-semibold border border-pink-200">Từ chối</Button>
-                  <Button className="bg-blue-500 text-white hover:bg-blue-600 rounded-md px-3 py-1 text-sm font-semibold">Xác nhận</Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      {/* Custom scrollbar style */}
-      <style>{`
-        .scrollbar-thin { scrollbar-width: thin; }
-        .scrollbar-thumb-orange-400::-webkit-scrollbar-thumb { background: #fb923c !important; border-radius: 8px; }
-        .scrollbar-thumb-orange-400::-webkit-scrollbar { background: transparent; width: 8px; }
-        .scrollbar-thumb-orange-400::-webkit-scrollbar-track { background: transparent; }
-        .scrollbar-thumb-orange-400 { scrollbar-color: #fb923c #fff0e5; }
-      `}</style>
     </div>
   );
 };
 
-export default DatBan; 
+export default TableBooking;

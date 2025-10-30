@@ -13,6 +13,9 @@ import NotFoundPage from "@/pages/NotFoundPage";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Home from "@/pages/Home";
 import CustomerPage from "@/pages/KhachHang/khachhang";
+import TableBooking from "@/pages/DatBan";
+import OrderedTableList from "@/pages/YeuCauDatBan/OrderedTableList";
+import ReviewPage from "@/pages/DanhGia/ReviewPage";
 
 const AppRoutes = () => {
   return (
@@ -90,15 +93,38 @@ const AppRoutes = () => {
       <Route
         path="/customer"
         element={
-          <ProtectedRoute allowedRoles={["Khách hàng"]}>
-            <CustomerPage />
+          <ProtectedRoute allowedRoles={["Khách hàng", "Người quản lý"]}>
+            < CustomerPage />
           </ProtectedRoute>
         }
       />
-
+      < Route
+        path="/booking/table"
+        element={
+          < ProtectedRoute allowedRoles={["Người quản lý", "Khách hàng"]} >
+            <TableBooking />
+          </ ProtectedRoute>
+        }
+      />
+      < Route
+        path="/ordered-tables"
+        element={
+          <ProtectedRoute allowedRoles={["Người quản lý"]} >
+            <OrderedTableList />
+          </ProtectedRoute >
+        }
+      />
+      < Route
+        path="/review"
+        element={
+          <ProtectedRoute allowedRoles={["Người quản lý", "Khách hàng"]} >
+            <ReviewPage />
+          </ProtectedRoute >
+        }
+      />
       {/* Fallback route */}
       <Route path="*" element={<NotFoundPage />} />
-    </Routes>
+    </Routes >
   );
 };
 

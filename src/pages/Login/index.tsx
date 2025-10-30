@@ -38,7 +38,7 @@ const Login: React.FC = () => {
             navigate("/table");
             break;
           case "Khách hàng":
-            navigate("/customer"); // sau này code lên giao diện khác
+            navigate("/"); // sau này code lên giao diện khác
             break;
           default:
             navigate("/notfoundpage");

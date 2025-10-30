@@ -56,7 +56,8 @@ export class UserService {
 
   static async updateEmployee(data: any) {
     try {
-      const response = await axiosInstance.put("/employee", { data });
+      console.log("Dữ liệu gửi lên:", data);
+      const response = await axiosInstance.put("/employee", data);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || "Lỗi khi cập nhật nhân viên");

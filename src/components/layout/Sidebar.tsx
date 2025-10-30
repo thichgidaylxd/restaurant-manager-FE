@@ -28,7 +28,9 @@ const Sidebar = () => {
     { path: "/dishes", label: "Thực đơn", icon: "🍽️" },
     { path: "/revenue", label: "Doanh thu", icon: "💰" },
     { path: "/employee", label: "Nhân viên", icon: "👥" },
-    { path: "/account", label: "Tài khoản", icon: "👤" }
+    { path: "/account", label: "Tài khoản", icon: "👤" },
+    { path: "/ordered-tables", label: "Đặt bàn", icon: "🍽️" }
+
   ];
 
   // sau này triển khai trang cài đặt
