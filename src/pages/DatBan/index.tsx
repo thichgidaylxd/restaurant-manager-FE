@@ -1,18 +1,41 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Users, Phone, User, Clock, AlertCircle } from 'lucide-react';
 
-const TableBooking = () => {
-  const [tables, setTables] = useState([]);
-  const [formData, setFormData] = useState({
+interface Table {
+  id: string;
+  name: string;
+  tableType: {
+    id: string;
+    name: string;
+  };
+  maxPerson: number;
+  status: string;
+}
+
+interface FormData {
+  phone: string;
+  name: string;
+  orderedTime: string;
+  personNumber: string;
+  tableId: string;
+}
+
+interface FormErrors {
+  [key: string]: string;
+}
+
+const TableBooking: React.FC = () => {
+  const [tables, setTables] = useState<Table[]>([]);
+  const [formData, setFormData] = useState<FormData>({
     phone: '',
     name: '',
     orderedTime: '',
     personNumber: '',
     tableId: ''
   });
-  const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [loading, setLoading] = useState<boolean>(false);
+  const [submitSuccess, setSubmitSuccess] = useState<boolean>(false);
 
   // Fetch danh sách bàn khi component mount
   useEffect(() => {
@@ -22,21 +45,25 @@ const TableBooking = () => {
   const fetchTables = async () => {
     try {
       const response = await fetch('https://restaurant-manager-be-f7mh.onrender.com/restaurant/api/tables');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       const result = await response.json();
-      console.log('API Response:', result);
 
       if (result.data && Array.isArray(result.data)) {
         // Lọc chỉ lấy bàn còn trống và đảm bảo dữ liệu hợp lệ
         const availableTables = result.data
           .filter(table => table && table.status === 'Trống')
           .map(table => ({
-            id: table.id || '',
+            id: table.id,
             name: table.name || 'Bàn không tên',
-            tableType: table.tableType?.name || table.tableType || 'Bàn thường',
+            tableType: {
+              id: table.tableType?.id || '',
+              name: table.tableType?.name || 'Bàn thường'
+            },
             maxPerson: table.maxPerson || 0,
             status: table.status || ''
           }));
-        console.log('Available Tables:', availableTables);
         setTables(availableTables);
       }
     } catch (error) {
@@ -45,17 +72,19 @@ const TableBooking = () => {
     }
   };
 
-  const validateForm = () => {
-    const newErrors = {};
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
 
     if (!formData.name.trim()) {
       newErrors.name = 'Vui lòng nhập Họ và tên';
+    } else if (formData.name.trim().length < 2) {
+      newErrors.name = 'Họ và tên phải có ít nhất 2 ký tự';
     }
 
     if (!formData.phone.trim()) {
       newErrors.phone = 'Vui lòng nhập Số điện thoại';
-    } else if (!/^[0-9]{10}$/.test(formData.phone)) {
-      newErrors.phone = 'Số điện thoại phải có 10 chữ số';
+    } else if (!/^(0[0-9]{9})$/.test(formData.phone.trim())) {
+      newErrors.phone = 'Số điện thoại không hợp lệ (phải bắt đầu bằng 0 và có 10 số)';
     }
 
     if (!formData.orderedTime) {
@@ -63,26 +92,39 @@ const TableBooking = () => {
     } else {
       const selectedTime = new Date(formData.orderedTime);
       const now = new Date();
+      const maxDate = new Date();
+      maxDate.setMonth(maxDate.getMonth() + 1);
+
       if (selectedTime < now) {
         newErrors.orderedTime = 'Thời gian đặt bàn phải sau thời điểm hiện tại';
+      } else if (selectedTime > maxDate) {
+        newErrors.orderedTime = 'Chỉ được đặt bàn trước tối đa 1 tháng';
       }
     }
 
+    const personNumber = parseInt(formData.personNumber);
     if (!formData.personNumber) {
       newErrors.personNumber = 'Vui lòng nhập Số người';
-    } else if (formData.personNumber < 1) {
+    } else if (isNaN(personNumber) || personNumber < 1) {
       newErrors.personNumber = 'Số người phải lớn hơn 0';
+    } else if (personNumber > 20) {
+      newErrors.personNumber = 'Số người không được vượt quá 20';
     }
 
     if (!formData.tableId) {
       newErrors.tableId = 'Vui lòng chọn Bàn';
+    } else {
+      const selectedTable = tables.find(table => table.id === formData.tableId);
+      if (selectedTable && parseInt(formData.personNumber) > selectedTable.maxPerson) {
+        newErrors.tableId = `Bàn này chỉ phục vụ tối đa ${selectedTable.maxPerson} người`;
+      }
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -97,7 +139,7 @@ const TableBooking = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!validateForm()) {
@@ -118,29 +160,29 @@ const TableBooking = () => {
         })
       });
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const result = await response.json();
 
-      if (response.ok) {
-        setSubmitSuccess(true);
-        // Reset form
-        setFormData({
-          phone: '',
-          name: '',
-          orderedTime: '',
-          personNumber: '',
-          tableId: ''
-        });
-        // Tải lại danh sách bàn
-        fetchTables();
+      setSubmitSuccess(true);
+      // Reset form
+      setFormData({
+        phone: '',
+        name: '',
+        orderedTime: '',
+        personNumber: '',
+        tableId: ''
+      });
+      // Tải lại danh sách bàn
+      await fetchTables();
 
-        // Ẩn thông báo thành công sau 3 giây
-        setTimeout(() => setSubmitSuccess(false), 3000);
-      } else {
-        alert('Có lỗi xảy ra: ' + (result.message || 'Vui lòng thử lại'));
-      }
+      // Ẩn thông báo thành công sau 3 giây
+      setTimeout(() => setSubmitSuccess(false), 3000);
     } catch (error) {
       console.error('Lỗi:', error);
-      alert('Không thể kết nối đến server');
+      alert('Không thể kết nối đến server. Vui lòng thử lại sau.');
     } finally {
       setLoading(false);
     }
@@ -354,7 +396,7 @@ const TableBooking = () => {
               {tables.length > 0 ? (
                 tables.map(table => (
                   <option key={table.id} value={table.id}>
-                    {table.name} - {table.tableType} (Tối đa {table.maxPerson} người)
+                    {table.name} - {table.tableType.name} (Tối đa {table.maxPerson} người)
                   </option>
                 ))
               ) : (
@@ -386,11 +428,17 @@ const TableBooking = () => {
               transition: 'all 0.3s',
               boxShadow: '0 4px 6px rgba(255, 107, 0, 0.3)'
             }}
-            onMouseOver={(e) => {
-              if (!loading) e.target.style.backgroundColor = '#ff8c00';
+            onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+              const button = e.currentTarget;
+              if (!loading) {
+                button.style.backgroundColor = '#ff8c00';
+              }
             }}
-            onMouseOut={(e) => {
-              if (!loading) e.target.style.backgroundColor = '#ff6b00';
+            onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+              const button = e.currentTarget;
+              if (!loading) {
+                button.style.backgroundColor = '#ff6b00';
+              }
             }}
           >
             {loading ? 'Đang xử lý...' : 'Đặt Bàn Ngay'}

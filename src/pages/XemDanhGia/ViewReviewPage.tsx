@@ -1,75 +1,105 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Star, Send, User, MessageCircle, RefreshCw } from 'lucide-react';
 import Sidebar from '@/components/layout/Sidebar';
+import { decodeToken } from '../DanhGia/ReviewPage';
 
-export const decodeToken = (token: string) => {
-    try {
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
-            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join(''));
-        return JSON.parse(jsonPayload);
-    } catch (error) {
-        console.error('Error decoding token:', error);
-        return null;
-    }
-};
+// Update interfaces
+interface Review {
+    id: string;
+    content: string;
+    starRating: number;
+    createdAt: string;
+    user?: {
+        username?: string;
+        name?: string;
+    };
+}
 
-const ViewReviewPage = () => {
-    const [reviews, setReviews] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [submitLoading, setSubmitLoading] = useState(false);
-    const [formData, setFormData] = useState({
+interface FormData {
+    userId?: string;
+    content: string;
+    ratingStar: number;
+}
+
+interface FormErrors {
+    auth?: string;
+    content?: string;
+    ratingStar?: string;
+    submit?: string;
+}
+
+interface RatingStats {
+    [key: number]: number;
+}
+
+// Add API service
+const API_URL = 'https://restaurant-manager-be-f7mh.onrender.com/restaurant/api';
+
+const ViewReviewPage: React.FC = () => {
+    const [reviews, setReviews] = useState<Review[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [submitLoading, setSubmitLoading] = useState<boolean>(false);
+    const [formData, setFormData] = useState<FormData>({
         content: '',
         ratingStar: 0
     });
-    const [hoverRating, setHoverRating] = useState(0);
-    const [errors, setErrors] = useState({});
-    const [submitSuccess, setSubmitSuccess] = useState(false);
+    const [hoverRating, setHoverRating] = useState<number>(0);
+    const [errors, setErrors] = useState<FormErrors>({});
+    const [submitSuccess, setSubmitSuccess] = useState<boolean>(false);
 
-    useEffect(() => {
-        fetchReviews();
-    }, []);
-
-    const fetchReviews = async () => {
+    // Memoize fetchReviews to prevent unnecessary re-renders
+    const fetchReviews = useCallback(async () => {
         setLoading(true);
         try {
-            const response = await fetch('https://restaurant-manager-be-f7mh.onrender.com/restaurant/api/review');
+            const response = await fetch(`${API_URL}/review`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             const result = await response.json();
-            console.log('Reviews:', result);
 
             if (result.data && Array.isArray(result.data)) {
-                // Sắp xếp đánh giá mới nhất lên đầu
-                const sortedReviews = result.data.sort((a, b) =>
-                    new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
-                );
+                const sortedReviews = result.data
+                    .filter((review: Review) => review && review.starRating)
+                    .sort((a: Review, b: Review) =>
+                        new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+                    );
                 setReviews(sortedReviews);
             }
         } catch (error) {
             console.error('Lỗi khi tải đánh giá:', error);
+            setReviews([]);
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
+    useEffect(() => {
+        fetchReviews();
+    }, [fetchReviews]);
 
-    const validateForm = () => {
-        const newErrors = {};
+    const validateForm = (): boolean => {
+        const newErrors: FormErrors = {};
         const userId = getUserIdFromToken();
 
+        // Validate authentication
         if (!userId) {
             newErrors.auth = 'Vui lòng đăng nhập để đánh giá';
+            setErrors(newErrors);
+            return false;
         }
 
-        if (!formData.content.trim()) {
+        // Validate content
+        if (!formData.content?.trim()) {
             newErrors.content = 'Vui lòng nhập nội dung đánh giá';
+        } else if (formData.content.trim().length < 10) {
+            newErrors.content = 'Nội dung đánh giá phải có ít nhất 10 ký tự';
         } else if (formData.content.length > 500) {
             newErrors.content = 'Nội dung không được quá 500 ký tự';
         }
 
-        if (formData.ratingStar === 0) {
-            newErrors.ratingStar = 'Vui lòng chọn số sao đánh giá';
+        // Validate star rating
+        if (!formData.ratingStar || formData.ratingStar < 1 || formData.ratingStar > 5) {
+            newErrors.ratingStar = 'Vui lòng chọn số sao đánh giá (1-5 sao)';
         }
 
         setErrors(newErrors);
@@ -141,13 +171,14 @@ const ViewReviewPage = () => {
         }
     };
 
-    const handleChange = (e) => {
+    const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
             [name]: value
         }));
-        if (errors[name]) {
+        // Clear error when user starts typing
+        if (errors[name as keyof FormErrors]) {
             setErrors(prev => ({
                 ...prev,
                 [name]: ''
@@ -155,7 +186,7 @@ const ViewReviewPage = () => {
         }
     };
 
-    const handleStarClick = (rating) => {
+    const handleStarClick = (rating: number) => {
         setFormData(prev => ({
             ...prev,
             ratingStar: rating
@@ -168,7 +199,7 @@ const ViewReviewPage = () => {
         }
     };
 
-    const renderStars = (rating, interactive = false, size = 24) => {
+    const renderStars = useCallback((rating: number, interactive: boolean = false, size: number = 24) => {
         return (
             <div style={{ display: 'flex', gap: '4px' }}>
                 {[1, 2, 3, 4, 5].map((star) => (
@@ -188,26 +219,41 @@ const ViewReviewPage = () => {
                 ))}
             </div>
         );
-    };
+    }, [hoverRating]);
 
-    const getAverageRating = () => {
-        if (reviews.length === 0) return 0;
+    const getAverageRating = useCallback((): number => {
+        if (!reviews.length) return 0;
         const sum = reviews.reduce((acc, review) => acc + (review.starRating || 0), 0);
-        return (sum / reviews.length).toFixed(1);
-    };
+        return Number((sum / reviews.length).toFixed(1));
+    }, [reviews]);
 
-    const getRatingStats = () => {
-        const stats = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    const getRatingStats = useCallback((): RatingStats => {
+        const stats: RatingStats = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
         reviews.forEach(review => {
             if (review.starRating >= 1 && review.starRating <= 5) {
                 stats[review.starRating]++;
             }
         });
         return stats;
+    }, [reviews]);
+
+    // Add proper type for mouse events
+    const handleMouseOver = (e: React.MouseEvent<HTMLDivElement>) => {
+        const target = e.currentTarget;
+        target.style.borderColor = '#ffb366';
+        target.style.transform = 'translateY(-2px)';
     };
 
-    const ratingStats = getRatingStats();
-    const maxCount = Math.max(...Object.values(ratingStats), 1);
+    const handleMouseOut = (e: React.MouseEvent<HTMLDivElement>) => {
+        const target = e.currentTarget;
+        target.style.borderColor = 'transparent';
+        target.style.transform = 'translateY(0)';
+    };
+
+    // Memoize these calculations
+    const ratingStats = React.useMemo(() => getRatingStats(), [getRatingStats]);
+    const maxCount = React.useMemo(() =>
+        Math.max(...Object.values(ratingStats), 1), [ratingStats]);
 
     return (
         <div className="table-grid-container flex w-full h-screen bg-orange-50 text-foreground">
@@ -384,14 +430,8 @@ const ViewReviewPage = () => {
                                             transition: 'all 0.3s',
                                             border: '2px solid transparent'
                                         }}
-                                        onMouseOver={(e) => {
-                                            e.currentTarget.style.borderColor = '#ffb366';
-                                            e.currentTarget.style.transform = 'translateY(-2px)';
-                                        }}
-                                        onMouseOut={(e) => {
-                                            e.currentTarget.style.borderColor = 'transparent';
-                                            e.currentTarget.style.transform = 'translateY(0)';
-                                        }}
+                                        onMouseOver={handleMouseOver}
+                                        onMouseOut={handleMouseOut}
                                     >
                                         <div style={{
                                             display: 'flex',

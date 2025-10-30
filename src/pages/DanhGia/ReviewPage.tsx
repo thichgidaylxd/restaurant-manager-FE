@@ -1,6 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { Star, Send, User, MessageCircle, RefreshCw } from 'lucide-react';
 
+interface Review {
+    id: string;
+    content: string;
+    starRating: number;
+    createdAt: string;
+    user?: {
+        username?: string;
+        name?: string;
+    };
+}
+
+interface FormData {
+    content: string;
+    ratingStar: number;
+}
+
+interface FormErrors {
+    auth?: string;
+    content?: string;
+    ratingStar?: string;
+}
+
+interface RatingStats {
+    [key: number]: number;
+}
+
 export const decodeToken = (token: string) => {
     try {
         const base64Url = token.split('.')[1];
@@ -15,17 +41,17 @@ export const decodeToken = (token: string) => {
     }
 };
 
-const ReviewPage = () => {
-    const [reviews, setReviews] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [submitLoading, setSubmitLoading] = useState(false);
-    const [formData, setFormData] = useState({
+const ReviewPage: React.FC = () => {
+    const [reviews, setReviews] = useState<Review[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [submitLoading, setSubmitLoading] = useState<boolean>(false);
+    const [formData, setFormData] = useState<FormData>({
         content: '',
         ratingStar: 0
     });
-    const [hoverRating, setHoverRating] = useState(0);
-    const [errors, setErrors] = useState({});
-    const [submitSuccess, setSubmitSuccess] = useState(false);
+    const [hoverRating, setHoverRating] = useState<number>(0);
+    const [errors, setErrors] = useState<FormErrors>({});
+    const [submitSuccess, setSubmitSuccess] = useState<boolean>(false);
 
     useEffect(() => {
         fetchReviews();
@@ -35,40 +61,44 @@ const ReviewPage = () => {
         setLoading(true);
         try {
             const response = await fetch('https://restaurant-manager-be-f7mh.onrender.com/restaurant/api/review');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             const result = await response.json();
-            console.log('Reviews:', result);
 
             if (result.data && Array.isArray(result.data)) {
-                // Sắp xếp đánh giá mới nhất lên đầu
-                const sortedReviews = result.data.sort((a, b) =>
-                    new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
-                );
+                const sortedReviews = result.data
+                    .filter((review: Review) => review) // Filter out null/undefined
+                    .sort((a: Review, b: Review) =>
+                        new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+                    );
                 setReviews(sortedReviews);
             }
         } catch (error) {
             console.error('Lỗi khi tải đánh giá:', error);
+            setReviews([]); // Set empty array on error
         } finally {
             setLoading(false);
         }
     };
 
 
-    const validateForm = () => {
-        const newErrors = {};
+    const validateForm = (): boolean => {
+        const newErrors: FormErrors = {};
         const userId = getUserIdFromToken();
 
         if (!userId) {
             newErrors.auth = 'Vui lòng đăng nhập để đánh giá';
         }
 
-        if (!formData.content.trim()) {
+        if (!formData.content?.trim()) {
             newErrors.content = 'Vui lòng nhập nội dung đánh giá';
         } else if (formData.content.length > 500) {
             newErrors.content = 'Nội dung không được quá 500 ký tự';
         }
 
-        if (formData.ratingStar === 0) {
-            newErrors.ratingStar = 'Vui lòng chọn số sao đánh giá';
+        if (!formData.ratingStar || formData.ratingStar < 1 || formData.ratingStar > 5) {
+            newErrors.ratingStar = 'Vui lòng chọn số sao đánh giá (1-5 sao)';
         }
 
         setErrors(newErrors);
@@ -84,12 +114,12 @@ const ReviewPage = () => {
         return decodedToken?.userAccountId;
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         const userId = getUserIdFromToken();
         if (!userId) {
-            alert('Vui lòng đăng nhập để đánh giá');
+            setErrors(prev => ({ ...prev, auth: 'Vui lòng đăng nhập để đánh giá' }));
             return;
         }
 
@@ -101,52 +131,51 @@ const ReviewPage = () => {
         try {
             const params = new URLSearchParams({
                 userId: userId.toString(),
-                content: formData.content,
+                content: formData.content.trim(),
                 ratingStar: formData.ratingStar.toString()
             });
 
-            const response = await fetch(`https://restaurant-manager-be-f7mh.onrender.com/restaurant/api/review?${params}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
+            const response = await fetch(
+                `https://restaurant-manager-be-f7mh.onrender.com/restaurant/api/review?${params}`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
                 }
-            });
+            );
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
 
             const result = await response.json();
+            setSubmitSuccess(true);
+            setFormData({ content: '', ratingStar: 0 });
+            await fetchReviews();
+            setTimeout(() => setSubmitSuccess(false), 3000);
 
-            if (response.ok) {
-                setSubmitSuccess(true);
-                setFormData({
-                    userId: '',
-                    content: '',
-                    ratingStar: 0
-                });
-                fetchReviews(); // Reload reviews
-
-                setTimeout(() => setSubmitSuccess(false), 3000);
-
-                // Scroll to reviews section
-                document.getElementById('reviews-section')?.scrollIntoView({
-                    behavior: 'smooth'
-                });
-            } else {
-                alert('Có lỗi xảy ra: ' + (result.message || 'Vui lòng thử lại'));
-            }
+            document.getElementById('reviews-section')?.scrollIntoView({
+                behavior: 'smooth'
+            });
         } catch (error) {
             console.error('Lỗi:', error);
-            alert('Không thể kết nối đến server');
+            setErrors(prev => ({
+                ...prev,
+                submit: 'Không thể gửi đánh giá. Vui lòng thử lại sau.'
+            }));
         } finally {
             setSubmitLoading(false);
         }
     };
 
-    const handleChange = (e) => {
+    const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
             [name]: value
         }));
-        if (errors[name]) {
+        if (errors[name as keyof FormErrors]) {
             setErrors(prev => ({
                 ...prev,
                 [name]: ''
@@ -154,7 +183,7 @@ const ReviewPage = () => {
         }
     };
 
-    const handleStarClick = (rating) => {
+    const handleStarClick = (rating: number) => {
         setFormData(prev => ({
             ...prev,
             ratingStar: rating
@@ -196,7 +225,7 @@ const ReviewPage = () => {
     };
 
     const getRatingStats = () => {
-        const stats = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+        const stats: RatingStats = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
         reviews.forEach(review => {
             if (review.starRating >= 1 && review.starRating <= 5) {
                 stats[review.starRating]++;
@@ -331,7 +360,7 @@ const ReviewPage = () => {
                                 value={formData.content}
                                 onChange={handleChange}
                                 placeholder="Chia sẻ trải nghiệm của bạn tại nhà hàng..."
-                                rows="5"
+                                rows={5}
                                 style={{
                                     width: '100%',
                                     padding: '12px 16px',
@@ -386,10 +415,12 @@ const ReviewPage = () => {
                                 gap: '10px'
                             }}
                             onMouseOver={(e) => {
-                                if (!submitLoading) e.target.style.backgroundColor = '#ff8c00';
+                                const button = e.target as HTMLButtonElement;
+                                if (!submitLoading) button.style.backgroundColor = '#ff8c00';
                             }}
                             onMouseOut={(e) => {
-                                if (!submitLoading) e.target.style.backgroundColor = '#ff6b00';
+                                const button = e.target as HTMLButtonElement;
+                                if (!submitLoading) button.style.backgroundColor = '#ff6b00';
                             }}
                         >
                             <Send size={20} />
@@ -459,7 +490,7 @@ const ReviewPage = () => {
                                     <div style={{ fontSize: '48px', fontWeight: 'bold', color: '#ff6b00', marginBottom: '8px' }}>
                                         {getAverageRating()}
                                     </div>
-                                    {renderStars(Math.round(getAverageRating()), false, 28)}
+                                    {renderStars(Math.min(Math.max(Math.round(Number(getAverageRating())), 0), 5), false, 28)}
                                     <div style={{ color: '#999', fontSize: '14px', marginTop: '8px' }}>
                                         Trung bình từ {reviews.length} đánh giá
                                     </div>

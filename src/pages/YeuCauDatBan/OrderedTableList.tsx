@@ -207,10 +207,12 @@ const OrderedTableList = () => {
                                 boxShadow: '0 4px 6px rgba(255, 107, 0, 0.3)'
                             }}
                             onMouseOver={(e) => {
-                                if (!loading) e.target.style.backgroundColor = '#ff8c00';
+                                const button = e.target as HTMLButtonElement;
+                                if (!loading) button.style.backgroundColor = '#ff8c00';
                             }}
                             onMouseOut={(e) => {
-                                if (!loading) e.target.style.backgroundColor = '#ff6b00';
+                                const button = e.target as HTMLButtonElement;
+                                if (!loading) button.style.backgroundColor = '#ff6b00';
                             }}
                         >
                             <RefreshCw size={18} style={{ animation: loading ? 'spin 1s linear infinite' : 'none' }} />
@@ -446,10 +448,12 @@ const OrderedTableList = () => {
                                                     transition: 'all 0.3s',
                                                 }}
                                                 onMouseOver={(e) => {
-                                                    if (actionLoading !== order.id) e.target.style.backgroundColor = '#059669';
+                                                    const button = e.target as HTMLButtonElement;
+                                                    if (actionLoading !== order.id) button.style.backgroundColor = '#059669';
                                                 }}
                                                 onMouseOut={(e) => {
-                                                    if (actionLoading !== order.id) e.target.style.backgroundColor = '#10b981';
+                                                    const button = e.target as HTMLButtonElement;
+                                                    if (actionLoading !== order.id) button.style.backgroundColor = '#10b981';
                                                 }}
                                             >
                                                 <CheckCircle size={18} />
@@ -477,10 +481,12 @@ const OrderedTableList = () => {
                                                     transition: 'all 0.3s',
                                                 }}
                                                 onMouseOver={(e) => {
-                                                    if (actionLoading !== order.id) e.target.style.backgroundColor = '#dc2626';
+                                                    const button = e.target as HTMLButtonElement;
+                                                    if (actionLoading !== order.id) button.style.backgroundColor = '#dc2626';
                                                 }}
                                                 onMouseOut={(e) => {
-                                                    if (actionLoading !== order.id) e.target.style.backgroundColor = '#ef4444';
+                                                    const button = e.target as HTMLButtonElement;
+                                                    if (actionLoading !== order.id) button.style.backgroundColor = '#ef4444';
                                                 }}
                                             >
                                                 <XCircle size={18} />
